@@ -707,7 +707,17 @@ commitlayersurfacenotify(struct wl_listener *listener, void *data)
 	LayerSurface *l = wl_container_of(listener, l, surface_commit);
 	struct wlr_layer_surface_v1 *layer_surface = l->layer_surface;
 	struct wlr_scene_tree *scene_layer = layers[layermap[layer_surface->current.layer]];
+	struct wlr_layer_surface_v1_state old_state;
 
+	if (l->layer_surface->initial_commit) {
+		/* Temporarily set the layer's current state to pending
+		 * so that we can easily arrange it */
+		old_state = l->layer_surface->current;
+		l->layer_surface->current = l->layer_surface->pending;
+		arrangelayers(l->mon);
+		l->layer_surface->current = old_state;
+		return;
+	}
 
 	if (layer_surface->current.committed == 0 && l->mapped == layer_surface->surface->mapped)
 		return;
@@ -794,7 +804,6 @@ createlayersurface(struct wl_listener *listener, void *data)
 	LayerSurface *l;
 	struct wlr_surface *surface = layer_surface->surface;
 	struct wlr_scene_tree *scene_layer = layers[layermap[layer_surface->pending.layer]];
-	struct wlr_layer_surface_v1_state old_state;
 
 	if (!layer_surface->output
 			&& !(layer_surface->output = selmon ? selmon->wlr_output : NULL)) {
@@ -819,15 +828,6 @@ createlayersurface(struct wl_listener *listener, void *data)
 
 	wl_list_insert(&l->mon->layers[layer_surface->pending.layer],&l->link);
 	wlr_surface_send_enter(surface, layer_surface->output);
-
-	/* Temporarily set the layer's current state to pending
-	 * so that we can easily arrange it
-	 */
-	old_state = layer_surface->current;
-	layer_surface->current = layer_surface->pending;
-	l->mapped = 1;
-	arrangelayers(l->mon);
-	layer_surface->current = old_state;
 }
 
 void
@@ -1484,7 +1484,6 @@ locksession(struct wl_listener *listener, void *data)
 void
 maplayersurfacenotify(struct wl_listener *listener, void *data)
 {
-	LayerSurface *l = wl_container_of(listener, l, map);
 	motionnotify(0);
 }
 
