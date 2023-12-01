@@ -861,22 +861,28 @@ createmon(struct wl_listener *listener, void *data)
 	struct wlr_output *wlr_output = data;
 	const MonitorRule *r;
 	size_t i;
-	Monitor *m = wlr_output->data = ecalloc(1, sizeof(*m));
+	struct wlr_output_state state;
+	Monitor *m;
+
+	if (!wlr_output_init_render(wlr_output, alloc, drw))
+		return;
+
+	m = wlr_output->data = ecalloc(1, sizeof(*m));
 	m->wlr_output = wlr_output;
 
-	wlr_output_init_render(wlr_output, alloc, drw);
-
-	/* Initialize monitor state using configured rules */
 	for (i = 0; i < LENGTH(m->layers); i++)
 		wl_list_init(&m->layers[i]);
+
+	wlr_output_state_init(&state);
+	/* Initialize monitor state using configured rules */
 	m->tagset[0] = m->tagset[1] = 1;
 	for (r = monrules; r < END(monrules); r++) {
 		if (!r->name || strstr(wlr_output->name, r->name)) {
 			m->mfact = r->mfact;
 			m->nmaster = r->nmaster;
-			wlr_output_set_scale(wlr_output, r->scale);
+			wlr_output_state_set_scale(&state, r->scale);
 			m->lt[0] = m->lt[1] = r->lt;
-			wlr_output_set_transform(wlr_output, r->rr);
+			wlr_output_state_set_transform(&state, r->rr);
 			m->m.x = r->x;
 			m->m.y = r->y;
 			break;
@@ -887,16 +893,16 @@ createmon(struct wl_listener *listener, void *data)
 	 * monitor supports only a specific set of modes. We just pick the
 	 * monitor's preferred mode; a more sophisticated compositor would let
 	 * the user configure it. */
-	wlr_output_set_mode(wlr_output, wlr_output_preferred_mode(wlr_output));
+	wlr_output_state_set_mode(&state, wlr_output_preferred_mode(wlr_output));
 
 	/* Set up event listeners */
 	LISTEN(&wlr_output->events.frame, &m->frame, rendermon);
 	LISTEN(&wlr_output->events.destroy, &m->destroy, cleanupmon);
 	LISTEN(&wlr_output->events.request_state, &m->request_state, requestmonstate);
 
-	wlr_output_enable(wlr_output, 1);
-	if (!wlr_output_commit(wlr_output))
-		return;
+	wlr_output_state_set_enabled(&state, 1);
+	wlr_output_commit_state(wlr_output, &state);
+	wlr_output_state_finish(&state);
 
 	wl_list_insert(&mons, &m->link);
 	printstatus();
@@ -1723,14 +1729,17 @@ outputmgrapplyortest(struct wlr_output_configuration_v1 *config, int test)
 	wl_list_for_each(config_head, &config->heads, link) {
 		struct wlr_output *wlr_output = config_head->state.output;
 		Monitor *m = wlr_output->data;
+		struct wlr_output_state state;
 
-		wlr_output_enable(wlr_output, config_head->state.enabled);
+		wlr_output_state_init(&state);
+		wlr_output_state_set_enabled(&state, config_head->state.enabled);
 		if (!config_head->state.enabled)
 			goto apply_or_test;
+
 		if (config_head->state.mode)
-			wlr_output_set_mode(wlr_output, config_head->state.mode);
+			wlr_output_state_set_mode(&state, config_head->state.mode);
 		else
-			wlr_output_set_custom_mode(wlr_output,
+			wlr_output_state_set_custom_mode(&state,
 					config_head->state.custom_mode.width,
 					config_head->state.custom_mode.height,
 					config_head->state.custom_mode.refresh);
@@ -1740,18 +1749,16 @@ outputmgrapplyortest(struct wlr_output_configuration_v1 *config, int test)
 		if (m->m.x != config_head->state.x || m->m.y != config_head->state.y)
 			wlr_output_layout_add(output_layout, wlr_output,
 					config_head->state.x, config_head->state.y);
-		wlr_output_set_transform(wlr_output, config_head->state.transform);
-		wlr_output_set_scale(wlr_output, config_head->state.scale);
-		wlr_output_enable_adaptive_sync(wlr_output,
+		wlr_output_state_set_transform(&state, config_head->state.transform);
+		wlr_output_state_set_scale(&state, config_head->state.scale);
+		wlr_output_state_set_adaptive_sync_enabled(&state,
 				config_head->state.adaptive_sync_enabled);
 
 apply_or_test:
-		if (test) {
-			ok &= wlr_output_test(wlr_output);
-			wlr_output_rollback(wlr_output);
-		} else {
-			ok &= wlr_output_commit(wlr_output);
-		}
+		ok &= test ? wlr_output_test_state(wlr_output, &state)
+				: wlr_output_commit_state(wlr_output, &state);
+
+		wlr_output_state_finish(&state);
 	}
 
 	if (ok)
