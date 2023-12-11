@@ -74,7 +74,7 @@
 
 /* enums */
 enum { CurNormal, CurPressed, CurMove, CurResize }; /* cursor */
-enum { XDGShell, LayerShell, X11Managed, X11Unmanaged }; /* client types */
+enum { XDGShell, LayerShell, X11 }; /* client types */
 enum { LyrBg, LyrBottom, LyrTile, LyrFloat, LyrFS, LyrTop, LyrOverlay, LyrBlock, NUM_LAYERS }; /* scene layers */
 #ifdef XWAYLAND
 enum { NetWMWindowTypeDialog, NetWMWindowTypeSplash, NetWMWindowTypeToolbar,
@@ -362,6 +362,7 @@ static struct wlr_cursor_shape_manager_v1 *cursor_shape_mgr;
 static struct wlr_cursor *cursor;
 static struct wlr_xcursor_manager *cursor_mgr;
 
+static struct wlr_scene_rect *root_bg;
 static struct wlr_session_lock_manager_v1 *session_lock_mgr;
 static struct wlr_scene_rect *locked_bg;
 static struct wlr_session_lock_v1 *cur_lock;
@@ -369,6 +370,7 @@ static struct wl_listener lock_listener = {.notify = locksession};
 
 static struct wlr_seat *seat;
 static struct wl_list keyboards;
+static struct wlr_surface *held_grab;
 static unsigned int cursor_mode;
 static Client *grabc;
 static int grabcx, grabcy; /* client-relative */
@@ -556,6 +558,7 @@ buttonpress(struct wl_listener *listener, void *data)
 	switch (event->state) {
 	case WLR_BUTTON_PRESSED:
 		cursor_mode = CurPressed;
+		held_grab = seat->pointer_state.focused_surface;
 		if (locked)
 			break;
 
@@ -575,6 +578,7 @@ buttonpress(struct wl_listener *listener, void *data)
 		}
 		break;
 	case WLR_BUTTON_RELEASED:
+		held_grab = NULL;
 		/* If you released any buttons, we exit interactive move/resize mode. */
 		/* TODO should reset to the pointer focus's current setcursor */
 		if (!locked && cursor_mode != CurNormal && cursor_mode != CurPressed) {
@@ -1615,7 +1619,6 @@ motionnotify(uint32_t time)
 	double sx = 0, sy = 0;
 	Client *c = NULL, *w = NULL;
 	LayerSurface *l = NULL;
-	int type;
 	struct wlr_surface *surface = NULL;
 
 	/* time is 0 in internal calls meant to restore pointer focus. */
@@ -1645,14 +1648,12 @@ motionnotify(uint32_t time)
 	/* Find the client under the pointer and send the event along. */
 	xytonode(cursor->x, cursor->y, &surface, &c, NULL, &sx, &sy);
 
-	if (cursor_mode == CurPressed && !seat->drag) {
-		if ((type = toplevel_from_wlr_surface(
-				 seat->pointer_state.focused_surface, &w, &l)) >= 0) {
-			c = w;
-			surface = seat->pointer_state.focused_surface;
-			sx = cursor->x - (type == LayerShell ? l->geom.x : w->geom.x);
-			sy = cursor->y - (type == LayerShell ? l->geom.y : w->geom.y);
-		}
+	if (cursor_mode == CurPressed && !seat->drag && surface != held_grab
+			&& toplevel_from_wlr_surface(held_grab, &w, &l) >= 0) {
+		c = w;
+		surface = held_grab;
+		sx = cursor->x - (l ? l->geom.x : w->geom.x);
+		sy = cursor->y - (l ? l->geom.y : w->geom.y);
 	}
 
 	/* If there's no client surface under the cursor, set the cursor image to a
@@ -2180,6 +2181,7 @@ setup(void)
 
 	/* Initialize the scene graph used to lay out windows */
 	scene = wlr_scene_create();
+	root_bg = wlr_scene_rect_create(&scene->tree, 0, 0, rootcolor);
 	for (i = 0; i < NUM_LAYERS; i++)
 		layers[i] = wlr_scene_tree_create(&scene->tree);
 	drag_icon = wlr_scene_tree_create(&scene->tree);
@@ -2564,6 +2566,9 @@ updatemons(struct wl_listener *listener, void *data)
 	/* Now that we update the output layout we can get its box */
 	wlr_output_layout_get_box(output_layout, NULL, &sgeom);
 
+	wlr_scene_node_set_position(&root_bg->node, sgeom.x, sgeom.y);
+	wlr_scene_rect_set_size(root_bg, sgeom.width, sgeom.height);
+
 	/* Make sure the clients are hidden when dwl is locked */
 	wlr_scene_node_set_position(&locked_bg->node, sgeom.x, sgeom.y);
 	wlr_scene_rect_set_size(locked_bg, sgeom.width, sgeom.height);
@@ -2746,7 +2751,7 @@ activatex11(struct wl_listener *listener, void *data)
 	Client *c = wl_container_of(listener, c, activate);
 
 	/* Only "managed" windows can be activated */
-	if (c->type == X11Managed)
+	if (!client_is_unmanaged(c))
 		wlr_xwayland_surface_activate(c->surface.xwayland, 1);
 }
 
@@ -2766,7 +2771,7 @@ configurex11(struct wl_listener *listener, void *data)
 	struct wlr_xwayland_surface_configure_event *event = data;
 	if (!c->mon)
 		return;
-	if (c->isfloating || c->type == X11Unmanaged)
+	if (c->isfloating || client_is_unmanaged(c))
 		resize(c, (struct wlr_box){.x = event->x, .y = event->y,
 				.width = event->width, .height = event->height}, 0);
 	else
@@ -2782,7 +2787,7 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	/* Allocate a Client for this surface */
 	c = xsurface->data = ecalloc(1, sizeof(*c));
 	c->surface.xwayland = xsurface;
-	c->type = xsurface->override_redirect ? X11Unmanaged : X11Managed;
+	c->type = X11;
 	c->bw = borderpx;
 
 	/* Listen to the various events it can emit */
