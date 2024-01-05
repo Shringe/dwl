@@ -245,6 +245,7 @@ static void cleanupmon(struct wl_listener *listener, void *data);
 static void closemon(Monitor *m);
 static void commitlayersurfacenotify(struct wl_listener *listener, void *data);
 static void commitnotify(struct wl_listener *listener, void *data);
+static void commitpopup(struct wl_listener *listener, void *data);
 static void createdecoration(struct wl_listener *listener, void *data);
 static void createidleinhibitor(struct wl_listener *listener, void *data);
 static void createkeyboard(struct wlr_keyboard *keyboard);
@@ -754,6 +755,33 @@ commitnotify(struct wl_listener *listener, void *data)
 }
 
 void
+commitpopup(struct wl_listener *listener, void *data)
+{
+	struct wlr_surface *surface = data;
+	struct wlr_xdg_popup *popup = wlr_xdg_popup_try_from_wlr_surface(surface);
+	LayerSurface *l = NULL;
+	Client *c = NULL;
+	struct wlr_box box;
+	int type = -1;
+
+	if (!popup->base->initial_commit)
+		return;
+
+	type = toplevel_from_wlr_surface(popup->base->surface, &c, &l);
+	if (!popup->parent || type < 0)
+		return;
+	popup->base->surface->data = wlr_scene_xdg_surface_create(
+			popup->parent->data, popup->base);
+	if ((l && !l->mon) || (c && !c->mon))
+		return;
+	box = type == LayerShell ? l->mon->m : c->mon->w;
+	box.x -= (type == LayerShell ? l->geom.x : c->geom.x);
+	box.y -= (type == LayerShell ? l->geom.y : c->geom.y);
+	wlr_xdg_popup_unconstrain_from_box(popup, &box);
+	wl_list_remove(&listener->link);
+}
+
+void
 createdecoration(struct wl_listener *listener, void *data)
 {
 	struct wlr_xdg_toplevel_decoration_v1 *deco = data;
@@ -989,22 +1017,7 @@ createpopup(struct wl_listener *listener, void *data)
 	/* This event is raised when a client (either xdg-shell or layer-shell)
 	 * creates a new popup. */
 	struct wlr_xdg_popup *popup = data;
-	LayerSurface *l = NULL;
-	Client *c = NULL;
-	struct wlr_box box;
-
-	int type = toplevel_from_wlr_surface(popup->base->surface, &c, &l);
-	if (!popup->parent || type < 0)
-		return;
-	popup->base->surface->data = wlr_scene_xdg_surface_create(
-			popup->parent->data, popup->base);
-	if ((l && !l->mon) || (c && !c->mon))
-		return;
-	box = type == LayerShell ? l->mon->m : c->mon->w;
-	box.x -= (type == LayerShell ? l->geom.x : c->geom.x);
-	box.y -= (type == LayerShell ? l->geom.y : c->geom.y);
-	/* FIXME: this send a configure event to a uninitialized wlr_xdg_surface */
-	wlr_xdg_popup_unconstrain_from_box(popup, &box);
+	LISTEN_STATIC(&popup->base->surface->events.commit, commitpopup);
 }
 
 void
