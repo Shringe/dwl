@@ -20,7 +20,6 @@
 #include <wlr/types/wlr_cursor_shape_v1.h>
 #include <wlr/types/wlr_data_control_v1.h>
 #include <wlr/types/wlr_data_device.h>
-#include <wlr/types/wlr_drm.h>
 #include <wlr/types/wlr_export_dmabuf_v1.h>
 #include <wlr/types/wlr_fractional_scale_v1.h>
 #include <wlr/types/wlr_gamma_control_v1.h>
@@ -2216,11 +2215,9 @@ setup(void)
 	 * with wlr_scene. */
 	wlr_renderer_init_wl_shm(drw, dpy);
 
-	if (wlr_renderer_get_dmabuf_texture_formats(drw)) {
-		wlr_drm_create(dpy, drw);
+	if (wlr_renderer_get_dmabuf_texture_formats(drw))
 		wlr_scene_set_linux_dmabuf_v1(scene,
 				wlr_linux_dmabuf_v1_create_with_renderer(dpy, 4, drw));
-	}
 
 	/* Autocreates an allocator for us.
 	 * The allocator is the bridge between the renderer and the backend. It
