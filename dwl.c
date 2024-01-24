@@ -64,6 +64,7 @@
 /* macros */
 #define MAX(A, B)               ((A) > (B) ? (A) : (B))
 #define MIN(A, B)               ((A) < (B) ? (A) : (B))
+#define ROUND(X)                ((int)((X < 0) ? (X - 0.5) : (X + 0.5)))
 #define CLEANMASK(mask)         (mask & ~WLR_MODIFIER_CAPS)
 #define VISIBLEON(C, M)         ((M) && (C)->mon == (M) && ((C)->tags & (M)->tagset[(M)->seltags]))
 #define LENGTH(X)               (sizeof X / sizeof X[0])
@@ -195,7 +196,7 @@ struct Monitor {
 	unsigned int seltags;
 	unsigned int sellt;
 	uint32_t tagset[2];
-	double mfact;
+	float mfact;
 	int gamma_lut_changed;
 	int nmaster;
 	char ltsymbol[16];
@@ -416,9 +417,9 @@ applybounds(Client *c, struct wlr_box *bbox)
 		c->geom.x = bbox->x + bbox->width - c->geom.width;
 	if (c->geom.y >= bbox->y + bbox->height)
 		c->geom.y = bbox->y + bbox->height - c->geom.height;
-	if (c->geom.x + c->geom.width + 2 * c->bw <= bbox->x)
+	if (c->geom.x + c->geom.width + 2 * (int)c->bw <= bbox->x)
 		c->geom.x = bbox->x;
-	if (c->geom.y + c->geom.height + 2 * c->bw <= bbox->y)
+	if (c->geom.y + c->geom.height + 2 * (int)c->bw <= bbox->y)
 		c->geom.y = bbox->y;
 }
 
@@ -427,7 +428,8 @@ applyrules(Client *c)
 {
 	/* rule matching */
 	const char *appid, *title;
-	uint32_t i, newtags = 0;
+	uint32_t newtags = 0;
+	int i;
 	const Rule *r;
 	Monitor *mon = selmon, *m;
 
@@ -521,7 +523,7 @@ arrangelayers(Monitor *m)
 		arrangelayer(m, &m->layers[i], &usable_area, 0);
 
 	/* Find topmost keyboard interactive layer, if such a layer exists */
-	for (i = 0; i < LENGTH(layers_above_shell); i++) {
+	for (i = 0; i < (int)LENGTH(layers_above_shell); i++) {
 		wl_list_for_each_reverse(l, &m->layers[layers_above_shell[i]], link) {
 			if (locked || !l->layer_surface->current.keyboard_interactive || !l->mapped)
 				continue;
@@ -657,7 +659,7 @@ cleanupmon(struct wl_listener *listener, void *data)
 {
 	Monitor *m = wl_container_of(listener, m, destroy);
 	LayerSurface *l, *tmp;
-	int i;
+	size_t i;
 
 	/* m->layers[i] are intentionally not unlinked */
 	for (i = 0; i < LENGTH(m->layers); i++) {
@@ -672,9 +674,9 @@ cleanupmon(struct wl_listener *listener, void *data)
 	m->wlr_output->data = NULL;
 	wlr_output_layout_remove(output_layout, m->wlr_output);
 	wlr_scene_output_destroy(m->scene_output);
-	wlr_scene_node_destroy(&m->fullscreen_bg->node);
 
 	closemon(m);
+	wlr_scene_node_destroy(&m->fullscreen_bg->node);
 	free(m);
 }
 
@@ -745,7 +747,7 @@ commitnotify(struct wl_listener *listener, void *data)
 	if (c->surface.xdg->initial_commit)
 		wlr_xdg_toplevel_set_wm_capabilities(c->surface.xdg->toplevel, WLR_XDG_TOPLEVEL_WM_CAPABILITIES_FULLSCREEN);
 
-	if (client_surface(c)->mapped)
+	if (client_surface(c)->mapped && c->mon)
 		resize(c, c->geom, (c->isfloating && !c->isfullscreen));
 
 	/* mark a pending resize as completed */
@@ -1633,17 +1635,17 @@ motionnotify(uint32_t time)
 	}
 
 	/* Update drag icon's position */
-	wlr_scene_node_set_position(&drag_icon->node, cursor->x, cursor->y);
+	wlr_scene_node_set_position(&drag_icon->node, ROUND(cursor->x), ROUND(cursor->y));
 
 	/* If we are currently grabbing the mouse, handle and return */
 	if (cursor_mode == CurMove) {
 		/* Move the grabbed client to the new position. */
-		resize(grabc, (struct wlr_box){.x = cursor->x - grabcx, .y = cursor->y - grabcy,
+		resize(grabc, (struct wlr_box){.x = ROUND(cursor->x) - grabcx, .y = ROUND(cursor->y) - grabcy,
 			.width = grabc->geom.width, .height = grabc->geom.height}, 1);
 		return;
 	} else if (cursor_mode == CurResize) {
 		resize(grabc, (struct wlr_box){.x = grabc->geom.x, .y = grabc->geom.y,
-			.width = cursor->x - grabc->geom.x, .height = cursor->y - grabc->geom.y}, 1);
+			.width = ROUND(cursor->x) - grabc->geom.x, .height = ROUND(cursor->y) - grabc->geom.y}, 1);
 		return;
 	}
 
@@ -1695,8 +1697,8 @@ moveresize(const Arg *arg)
 	setfloating(grabc, 1);
 	switch (cursor_mode = arg->ui) {
 	case CurMove:
-		grabcx = cursor->x - grabc->geom.x;
-		grabcy = cursor->y - grabc->geom.y;
+		grabcx = ROUND(cursor->x) - grabc->geom.x;
+		grabcy = ROUND(cursor->y) - grabc->geom.y;
 		wlr_cursor_set_xcursor(cursor, cursor_mgr, "fleur");
 		break;
 	case CurResize:
@@ -1769,9 +1771,6 @@ apply_or_test:
 	else
 		wlr_output_configuration_v1_send_failed(config);
 	wlr_output_configuration_v1_destroy(config);
-
-	/* TODO: use a wrapper function? */
-	updatemons(NULL, NULL);
 }
 
 void
@@ -2089,6 +2088,8 @@ setgamma(struct wl_listener *listener, void *data)
 {
 	struct wlr_gamma_control_manager_v1_set_gamma_event *event = data;
 	Monitor *m = event->output->data;
+	if (!m)
+		return;
 	m->gamma_lut_changed = 1;
 	wlr_output_schedule_frame(m->wlr_output);
 }
@@ -2115,7 +2116,7 @@ setmfact(const Arg *arg)
 
 	if (!arg || !selmon || !selmon->lt[selmon->sellt]->arrange)
 		return;
-	f = arg->f < 1.0 ? arg->f + selmon->mfact : arg->f - 1.0;
+	f = arg->f < 1.0f ? arg->f + selmon->mfact : arg->f - 1.0f;
 	if (f < 0.1 || f > 0.9)
 		return;
 	selmon->mfact = f;
@@ -2177,7 +2178,7 @@ setup(void)
 	struct sigaction sa = {.sa_flags = SA_RESTART, .sa_handler = handlesig};
 	sigemptyset(&sa.sa_mask);
 
-	for (i = 0; i < LENGTH(sig); i++)
+	for (i = 0; i < (int)LENGTH(sig); i++)
 		sigaction(sig[i], &sa, NULL);
 
 	wlr_log_init(log_level, NULL);
@@ -2287,7 +2288,7 @@ setup(void)
 	wl_signal_add(&session_lock_mgr->events.new_lock, &lock_listener);
 	LISTEN_STATIC(&session_lock_mgr->events.destroy, destroysessionmgr);
 	locked_bg = wlr_scene_rect_create(layers[LyrBlock], sgeom.width, sgeom.height,
-			(float [4]){0.1, 0.1, 0.1, 1.0});
+			(float [4]){0.1f, 0.1f, 0.1f, 1.0f});
 	wlr_scene_node_set_enabled(&locked_bg->node, 0);
 
 	/* Use decoration protocols to negotiate server-side decorations */
@@ -2463,7 +2464,8 @@ tagmon(const Arg *arg)
 void
 tile(Monitor *m)
 {
-	unsigned int i, n = 0, mw, my, ty;
+	unsigned int mw, my, ty;
+	int i, n = 0;
 	Client *c;
 
 	wl_list_for_each(c, &clients, link)
@@ -2473,7 +2475,7 @@ tile(Monitor *m)
 		return;
 
 	if (n > m->nmaster)
-		mw = m->nmaster ? m->w.width * m->mfact : 0;
+		mw = m->nmaster ? ROUND(m->w.width * m->mfact) : 0;
 	else
 		mw = m->w.width;
 	i = my = ty = 0;
