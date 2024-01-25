@@ -341,6 +341,7 @@ static pid_t child_pid = -1;
 static int locked;
 static void *exclusive_focus;
 static struct wl_display *dpy;
+static struct wl_event_loop *event_loop;
 static struct wlr_backend *backend;
 static struct wlr_scene *scene;
 static struct wlr_scene_tree *layers[NUM_LAYERS];
@@ -652,6 +653,10 @@ cleanup(void)
 	/* Remove event source that use the dpy event loop before destroying dpy */
 	wl_event_source_remove(kb_group.key_repeat_source);
 	wl_event_source_remove(vkb_group.key_repeat_source);
+
+	/* If it's not destroyed manually it will cause a use-after-free of wlr_seat.
+	 * Destroy it until it's fixed in the wlroots side */
+	wlr_backend_destroy(backend);
 
 	wl_display_destroy(dpy);
 	/* Destroy after the wayland display (when the monitors are already destroyed)
@@ -2191,12 +2196,13 @@ setup(void)
 	/* The Wayland display is managed by libwayland. It handles accepting
 	 * clients from the Unix socket, manging Wayland globals, and so on. */
 	dpy = wl_display_create();
+	event_loop = wl_display_get_event_loop(dpy);
 
 	/* The backend is a wlroots feature which abstracts the underlying input and
 	 * output hardware. The autocreate option will choose the most suitable
 	 * backend based on the current environment, such as opening an X11 window
 	 * if an X11 server is running. */
-	if (!(backend = wlr_backend_autocreate(dpy, &session)))
+	if (!(backend = wlr_backend_autocreate(event_loop, &session)))
 		die("couldn't create backend");
 
 	/* Initialize the scene graph used to lay out windows */
@@ -2389,10 +2395,8 @@ setup(void)
 	LISTEN(&vkb_group.wlr_group->keyboard.events.key, &vkb_group.key, keypress);
 	LISTEN(&vkb_group.wlr_group->keyboard.events.modifiers, &vkb_group.modifiers, keypressmod);
 
-	kb_group.key_repeat_source = wl_event_loop_add_timer(
-			wl_display_get_event_loop(dpy), keyrepeat, &kb_group);
-	vkb_group.key_repeat_source = wl_event_loop_add_timer(
-			wl_display_get_event_loop(dpy), keyrepeat, &vkb_group);
+	kb_group.key_repeat_source = wl_event_loop_add_timer(event_loop, keyrepeat, &kb_group);
+	vkb_group.key_repeat_source = wl_event_loop_add_timer(event_loop, keyrepeat, &vkb_group);
 
 	/* A seat can only have one keyboard, but this is a limitation of the
 	 * Wayland protocol - not wlroots. We assign all connected keyboards to the
