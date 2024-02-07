@@ -756,8 +756,11 @@ commitnotify(struct wl_listener *listener, void *data)
 {
 	Client *c = wl_container_of(listener, c, commit);
 
-	if (c->surface.xdg->initial_commit)
+	if (c->surface.xdg->initial_commit) {
 		wlr_xdg_toplevel_set_wm_capabilities(c->surface.xdg->toplevel, WLR_XDG_TOPLEVEL_WM_CAPABILITIES_FULLSCREEN);
+		wlr_xdg_toplevel_set_size(c->surface.xdg->toplevel, 0, 0);
+		return;
+	}
 
 	if (client_surface(c)->mapped && c->mon)
 		resize(c, c->geom, (c->isfloating && !c->isfullscreen));
