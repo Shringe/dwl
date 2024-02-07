@@ -759,6 +759,8 @@ commitnotify(struct wl_listener *listener, void *data)
 	if (c->surface.xdg->initial_commit) {
 		wlr_xdg_toplevel_set_wm_capabilities(c->surface.xdg->toplevel, WLR_XDG_TOPLEVEL_WM_CAPABILITIES_FULLSCREEN);
 		wlr_xdg_toplevel_set_size(c->surface.xdg->toplevel, 0, 0);
+		if (c->decoration)
+			requestdecorationmode(&c->set_decoration_mode, c->decoration);
 		return;
 	}
 
@@ -1052,6 +1054,7 @@ void
 destroydecoration(struct wl_listener *listener, void *data)
 {
 	Client *c = wl_container_of(listener, c, destroy_decoration);
+	c->decoration = NULL;
 
 	wl_list_remove(&c->destroy_decoration.link);
 	wl_list_remove(&c->set_decoration_mode.link);
@@ -1929,8 +1932,9 @@ void
 requestdecorationmode(struct wl_listener *listener, void *data)
 {
 	Client *c = wl_container_of(listener, c, set_decoration_mode);
-	wlr_xdg_toplevel_decoration_v1_set_mode(c->decoration,
-			WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
+	if (c->surface.xdg->initialized)
+		wlr_xdg_toplevel_decoration_v1_set_mode(c->decoration,
+				WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
 }
 
 void
