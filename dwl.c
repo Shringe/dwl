@@ -571,7 +571,7 @@ buttonpress(struct wl_listener *listener, void *data)
 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
 
 	switch (event->state) {
-	case WLR_BUTTON_PRESSED:
+	case WL_POINTER_BUTTON_STATE_PRESSED:
 		cursor_mode = CurPressed;
 		held_grab = seat->pointer_state.focused_surface;
 		if (locked)
@@ -592,7 +592,7 @@ buttonpress(struct wl_listener *listener, void *data)
 			}
 		}
 		break;
-	case WLR_BUTTON_RELEASED:
+	case WL_POINTER_BUTTON_STATE_RELEASED:
 		held_grab = NULL;
 		/* If you released any buttons, we exit interactive move/resize mode. */
 		/* TODO should reset to the pointer focus's current setcursor */
