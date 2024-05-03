@@ -289,6 +289,7 @@ static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Client *focustop(Monitor *m);
 static void fullscreennotify(struct wl_listener *listener, void *data);
+static void gpureset(struct wl_listener *listener, void *data);
 static void handlesig(int signo);
 static void incnmaster(const Arg *arg);
 static void inputdevice(struct wl_listener *listener, void *data);
@@ -1455,6 +1456,30 @@ fullscreennotify(struct wl_listener *listener, void *data)
 }
 
 void
+gpureset(struct wl_listener *listener, void *data)
+{
+	struct wlr_renderer *old_drw = drw;
+	struct wlr_allocator *old_alloc = alloc;
+	struct Monitor *m;
+	if (!(drw = wlr_renderer_autocreate(backend)))
+		die("couldn't recreate renderer");
+
+	if (!(alloc = wlr_allocator_autocreate(backend, drw)))
+		die("couldn't recreate allocator");
+
+	LISTEN_STATIC(&drw->events.lost, gpureset);
+
+	wlr_compositor_set_renderer(compositor, drw);
+
+	wl_list_for_each(m, &mons, link) {
+		wlr_output_init_render(m->wlr_output, alloc, drw);
+	}
+
+	wlr_allocator_destroy(old_alloc);
+	wlr_renderer_destroy(old_drw);
+}
+
+void
 handlesig(int signo)
 {
 	if (signo == SIGCHLD) {
@@ -2394,6 +2419,7 @@ setup(void)
 	 * supports for shared memory, this configures that for clients. */
 	if (!(drw = wlr_renderer_autocreate(backend)))
 		die("couldn't create renderer");
+	LISTEN_STATIC(&drw->events.lost, gpureset);
 
 	/* Create shm, drm and linux_dmabuf interfaces by ourselves.
 	 * The simplest way is call:
