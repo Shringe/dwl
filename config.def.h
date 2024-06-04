@@ -36,6 +36,8 @@ static const Layout layouts[] = {
 };
 
 /* monitors */
+/* (x=-1, y=-1) is reserved as an "autoconfigure" monitor position indicator */
+/* WARNING: negative values other than (-1, -1) cause problems with xwayland clients' menus */
 /* NOTE: ALWAYS add a fallback rule, even if you are completely sure it won't be used */
 static const MonitorRule monrules[] = {
 	/* name       mfact  nmaster scale layout       rotate/reflect                x    y */
@@ -115,7 +117,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 
 /* commands */
 static const char *termcmd[] = { "foot", NULL };
-static const char *menucmd[] = { "bemenu-run", NULL };
+static const char *menucmd[] = { "wmenu-run", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
