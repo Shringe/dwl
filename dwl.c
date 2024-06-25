@@ -72,6 +72,7 @@
 #define MAX(A, B)               ((A) > (B) ? (A) : (B))
 #define MIN(A, B)               ((A) < (B) ? (A) : (B))
 #define ROUND(X)                ((int)((X < 0) ? (X - 0.5) : (X + 0.5)))
+#define CEIL(X)                 ((int)((X < 0) ? (X) : ((int)X == X) ? (X) : ((int)X + 1)))
 #define CLEANMASK(mask)         (mask & ~WLR_MODIFIER_CAPS)
 #define VISIBLEON(C, M)         ((M) && (C)->mon == (M) && ((C)->tags & (M)->tagset[(M)->seltags]))
 #define LENGTH(X)               (sizeof X / sizeof X[0])
@@ -936,6 +937,8 @@ createlayersurface(struct wl_listener *listener, void *data)
 
 	wl_list_insert(&l->mon->layers[layer_surface->pending.layer],&l->link);
 	wlr_surface_send_enter(surface, layer_surface->output);
+	wlr_fractional_scale_v1_notify_scale(surface, l->mon->wlr_output->scale);
+	wlr_surface_set_preferred_buffer_scale(surface, CEIL(l->mon->wlr_output->scale));
 }
 
 void
@@ -1700,8 +1703,7 @@ mapnotify(struct wl_listener *listener, void *data)
 	if (client_is_unmanaged(c)) {
 		/* Unmanaged clients always are floating */
 		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
-		wlr_scene_node_set_position(&c->scene->node, c->geom.x + borderpx,
-				c->geom.y + borderpx);
+		wlr_scene_node_set_position(&c->scene->node, c->geom.x, c->geom.y);
 		if (client_wants_focus(c)) {
 			focusclient(c, 1);
 			exclusive_focus = c;
@@ -3092,7 +3094,7 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	c = xsurface->data = ecalloc(1, sizeof(*c));
 	c->surface.xwayland = xsurface;
 	c->type = X11;
-	c->bw = borderpx;
+	c->bw = client_is_unmanaged(c) ? 0 : borderpx;
 
 	/* Listen to the various events it can emit */
 	LISTEN(&xsurface->events.associate, &c->associate, associatex11);
