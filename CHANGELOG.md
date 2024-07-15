@@ -6,13 +6,21 @@
 
 
 ## Unreleased
+
+This version is just 0.6 with wlroots 0.18 compatibility.
+
 ### Added
-### Changed
-### Deprecated
-### Removed
-### Fixed
-### Security
+
+* Add support for the alpha-modifier-v1 protocol ([wlroots!4616][wlroots!4616]).
+* dwl now will survive GPU resets ([#601][601]).
+
+[wlroots!4616]: https://gitlab.freedesktop.org/wlroots/wlroots/-/merge_requests/4616
+[601]: https://codeberg.org/dwl/dwl/issues/601
+
+
 ### Contributors
+
+Guido Cella
 
 
 ## 0.6
