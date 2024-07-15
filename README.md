@@ -73,8 +73,9 @@ Xwayland (runtime only)
 ```
 
 Simply install these (and their `-devel` versions if your distro has separate
-development packages) and run `make`.  If you wish to build against a Git
-version of wlroots, check out the [wlroots-next branch].
+development packages) and run `make`. You need to use the Git version of
+wlroots to build the `main` branch. If you wish to build against a released
+version of wlroots, use a release or a [0.x branch].
 
 To enable XWayland, you should uncomment its flags in `config.mk`.
 
@@ -168,7 +169,7 @@ inspiration, and to the various contributors to the project, including:
 [#dwl on Libera Chat]: https://web.libera.chat/?channels=#dwl
 [Wayland]: https://wayland.freedesktop.org/
 [wlroots]: https://gitlab.freedesktop.org/wlroots/wlroots/
-[wlroots-next branch]: https://codeberg.org/dwl/dwl/src/branch/wlroots-next
+[0.x branch]: https://codeberg.org/dwl/dwl/branches
 [patches repository]: https://codeberg.org/dwl/dwl-patches
 [s6]: https://skarnet.org/software/s6/
 [anopa]: https://jjacky.com/anopa/
