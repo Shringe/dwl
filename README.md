@@ -181,15 +181,19 @@ inspiration, and to the various contributors to the project, including:
 - Stivvo for output management and fullscreen support, and patch maintenance
 
 
-[`systemd --user`]: https://wiki.archlinux.org/title/Systemd/User [#dwl on Libera Chat]: https://web.libera.chat/?channels=#dwl
-[0.7-rc1]: https://codeberg.org/dwl/dwl/releases/tag/v0.7-rc1 [0.x branch]: https://codeberg.org/dwl/dwl/branches
+[`systemd --user`]: https://wiki.archlinux.org/title/Systemd/User
+[#dwl on Libera Chat]: https://web.libera.chat/?channels=#dwl
+[0.7-rc1]: https://codeberg.org/dwl/dwl/releases/tag/v0.7-rc1
+[0.x branch]: https://codeberg.org/dwl/dwl/branches
 [anopa]: https://jjacky.com/anopa/
 [dinit]: https://davmac.org/projects/dinit/
-[dwl-patches]: https://codeberg.org/dwl/dwl-patches [list of useful resources on our wiki]: https://codeberg.org/dwl/dwl/wiki/Home#migrating-from-x
+[dwl-patches]: https://codeberg.org/dwl/dwl-patches
+[list of useful resources on our wiki]: https://codeberg.org/dwl/dwl/wiki/Home#migrating-from-x
 [main]: https://codeberg.org/dwl/dwl/src/branch/main
 [release]: https://codeberg.org/dwl/dwl/releases
 [runit]: http://smarden.org/runit/faq.html#userservices
 [s6]: https://skarnet.org/software/s6/
 [wlroots]: https://gitlab.freedesktop.org/wlroots/wlroots/
-[wiki]: https://codeberg.org/dwl/dwl/wiki/Home#compatible-status-bars [Discord server]: https://discord.gg/jJxZnrGPWN
+[wiki]: https://codeberg.org/dwl/dwl/wiki/Home#compatible-status-bars
+[Discord server]: https://discord.gg/jJxZnrGPWN
 [Wayland]: https://wayland.freedesktop.org/
