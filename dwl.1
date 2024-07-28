@@ -146,13 +146,5 @@ with s6 in the background:
 .Xr wmenu 1 ,
 .Xr dwm 1 ,
 .Xr xkeyboard-config 7
-.Sh CAVEATS
-The child process's standard input is connected with a pipe to
-.Nm .
-If the child process neither reads from the pipe nor closes its
-standard input,
-.Nm
-will freeze after a while due to it blocking when writing to the full
-pipe buffer.
 .Sh BUGS
 All of them.
