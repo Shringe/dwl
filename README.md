@@ -14,6 +14,8 @@ philosophy. Like dwm, dwl is:
 
 ## Getting Started:
 
+### **dwl branch 0.7 and releases based upon 0.7 build against [wlroots] 0.18**
+
 ### Latest semi-stable [release]
 This is probably where you want to start. This builds against the dependent
 packages' versions currently shipping in major distributions. If your
