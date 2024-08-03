@@ -1368,7 +1368,6 @@ focusclient(Client *c, int lift)
 		wl_list_insert(&fstack, &c->flink);
 		selmon = c->mon;
 		c->isurgent = 0;
-		client_restack_surface(c);
 
 		/* Don't change border color if there is an exclusive focus or we are
 		 * handling a drag operation */
