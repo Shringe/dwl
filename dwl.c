@@ -3083,13 +3083,14 @@ configurex11(struct wl_listener *listener, void *data)
 {
 	Client *c = wl_container_of(listener, c, configure);
 	struct wlr_xwayland_surface_configure_event *event = data;
-	/* TODO: figure out if there is another way to do this */
+	/* This also handles "unmanaged" clients (because we do not assign
+	 * them a monitor) */
 	if (!c->mon) {
 		wlr_xwayland_surface_configure(c->surface.xwayland,
 				event->x, event->y, event->width, event->height);
 		return;
 	}
-	if (c->isfloating || client_is_unmanaged(c))
+	if (c->isfloating)
 		resize(c, (struct wlr_box){.x = event->x, .y = event->y,
 				.width = event->width + c->bw * 2, .height = event->height + c->bw * 2}, 0);
 	else
