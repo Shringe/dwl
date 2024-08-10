@@ -759,8 +759,7 @@ commitlayersurfacenotify(struct wl_listener *listener, void *data)
 	struct wlr_layer_surface_v1_state old_state;
 
 	if (l->layer_surface->initial_commit) {
-		wlr_fractional_scale_v1_notify_scale(layer_surface->surface, l->mon->wlr_output->scale);
-		wlr_surface_set_preferred_buffer_scale(layer_surface->surface, (int32_t)ceilf(l->mon->wlr_output->scale));
+		client_set_scale(layer_surface->surface, l->mon->wlr_output->scale);
 
 		/* Temporarily set the layer's current state to pending
 		 * so that we can easily arrange it */
@@ -800,8 +799,7 @@ commitnotify(struct wl_listener *listener, void *data)
 		 */
 		applyrules(c);
 		if (c->mon) {
-			wlr_surface_set_preferred_buffer_scale(client_surface(c), (int)ceilf(c->mon->wlr_output->scale));
-			wlr_fractional_scale_v1_notify_scale(client_surface(c), c->mon->wlr_output->scale);
+			client_set_scale(client_surface(c), c->mon->wlr_output->scale);
 		}
 		setmon(c, NULL, 0); /* Make sure to reapply rules in mapnotify() */
 
