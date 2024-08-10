@@ -126,9 +126,9 @@ client_get_appid(Client *c)
 {
 #ifdef XWAYLAND
 	if (client_is_x11(c))
-		return c->surface.xwayland->class;
+		return c->surface.xwayland->class ? c->surface.xwayland->class : "broken";
 #endif
-	return c->surface.xdg->toplevel->app_id;
+	return c->surface.xdg->toplevel->app_id ? c->surface.xdg->toplevel->app_id : "broken";
 }
 
 static inline void
@@ -200,9 +200,9 @@ client_get_title(Client *c)
 {
 #ifdef XWAYLAND
 	if (client_is_x11(c))
-		return c->surface.xwayland->title;
+		return c->surface.xwayland->title ? c->surface.xwayland->title : "broken";
 #endif
-	return c->surface.xdg->toplevel->title;
+	return c->surface.xdg->toplevel->title ? c->surface.xdg->toplevel->title : "broken";
 }
 
 static inline int

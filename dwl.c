@@ -358,7 +358,6 @@ static void xytonode(double x, double y, struct wlr_surface **psurface,
 static void zoom(const Arg *arg);
 
 /* variables */
-static const char broken[] = "broken";
 static pid_t child_pid = -1;
 static int locked;
 static void *exclusive_focus;
@@ -462,10 +461,8 @@ applyrules(Client *c)
 	Monitor *mon = selmon, *m;
 
 	c->isfloating = client_is_float_type(c);
-	if (!(appid = client_get_appid(c)))
-		appid = broken;
-	if (!(title = client_get_title(c)))
-		title = broken;
+	appid = client_get_appid(c);
+	title = client_get_title(c);
 
 	for (r = rules; r < END(rules); r++) {
 		if ((!r->title || strstr(title, r->title))
@@ -2040,7 +2037,6 @@ printstatus(void)
 	Monitor *m = NULL;
 	Client *c;
 	uint32_t occ, urg, sel;
-	const char *appid, *title;
 
 	wl_list_for_each(m, &mons, link) {
 		occ = urg = 0;
@@ -2052,10 +2048,8 @@ printstatus(void)
 				urg |= c->tags;
 		}
 		if ((c = focustop(m))) {
-			title = client_get_title(c);
-			appid = client_get_appid(c);
-			printf("%s title %s\n", m->wlr_output->name, title ? title : broken);
-			printf("%s appid %s\n", m->wlr_output->name, appid ? appid : broken);
+			printf("%s title %s\n", m->wlr_output->name, client_get_title(c));
+			printf("%s appid %s\n", m->wlr_output->name, client_get_appid(c));
 			printf("%s fullscreen %d\n", m->wlr_output->name, c->isfullscreen);
 			printf("%s floating %d\n", m->wlr_output->name, c->isfloating);
 			sel = c->tags;
