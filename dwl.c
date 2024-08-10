@@ -106,15 +106,18 @@ typedef struct {
 
 typedef struct Monitor Monitor;
 typedef struct {
-	/* Must keep these three elements in this order */
+	/* Must keep this field first */
 	unsigned int type; /* XDGShell or X11* */
-	struct wlr_box geom; /* layout-relative, includes border */
+
 	Monitor *mon;
 	struct wlr_scene_tree *scene;
 	struct wlr_scene_rect *border[4]; /* top, bottom, left, right */
 	struct wlr_scene_tree *scene_surface;
 	struct wl_list link;
 	struct wl_list flink;
+	struct wlr_box geom; /* layout-relative, includes border */
+	struct wlr_box prev; /* layout-relative, includes border */
+	struct wlr_box bounds; /* only width and height are used */
 	union {
 		struct wlr_xdg_surface *xdg;
 		struct wlr_xwayland_surface *xwayland;
@@ -129,8 +132,6 @@ typedef struct {
 	struct wl_listener fullscreen;
 	struct wl_listener set_decoration_mode;
 	struct wl_listener destroy_decoration;
-	struct wlr_box prev; /* layout-relative, includes border */
-	struct wlr_box bounds;
 #ifdef XWAYLAND
 	struct wl_listener activate;
 	struct wl_listener associate;
@@ -166,10 +167,11 @@ typedef struct {
 } KeyboardGroup;
 
 typedef struct {
-	/* Must keep these three elements in this order */
+	/* Must keep this field first */
 	unsigned int type; /* LayerShell */
-	struct wlr_box geom;
+
 	Monitor *mon;
+	struct wlr_box geom;
 	struct wlr_scene_tree *scene;
 	struct wlr_scene_tree *popups;
 	struct wlr_scene_layer_surface_v1 *scene_layer;
