@@ -834,8 +834,10 @@ commitpopup(struct wl_listener *listener, void *data)
 		return;
 	popup->base->surface->data = wlr_scene_xdg_surface_create(
 			popup->parent->data, popup->base);
-	if ((l && !l->mon) || (c && !c->mon))
+	if ((l && !l->mon) || (c && !c->mon)) {
+		wlr_xdg_popup_destroy(popup);
 		return;
+	}
 	box = type == LayerShell ? l->mon->m : c->mon->w;
 	box.x -= (type == LayerShell ? l->scene->node.x : c->geom.x);
 	box.y -= (type == LayerShell ? l->scene->node.y : c->geom.y);
