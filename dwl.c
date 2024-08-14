@@ -802,10 +802,11 @@ commitnotify(struct wl_listener *listener, void *data)
 		}
 		setmon(c, NULL, 0); /* Make sure to reapply rules in mapnotify() */
 
-		wlr_xdg_toplevel_set_wm_capabilities(c->surface.xdg->toplevel, WLR_XDG_TOPLEVEL_WM_CAPABILITIES_FULLSCREEN);
-		wlr_xdg_toplevel_set_size(c->surface.xdg->toplevel, 0, 0);
+		wlr_xdg_toplevel_set_wm_capabilities(c->surface.xdg->toplevel,
+				WLR_XDG_TOPLEVEL_WM_CAPABILITIES_FULLSCREEN);
 		if (c->decoration)
 			requestdecorationmode(&c->set_decoration_mode, c->decoration);
+		wlr_xdg_toplevel_set_size(c->surface.xdg->toplevel, 0, 0);
 		return;
 	}
 
