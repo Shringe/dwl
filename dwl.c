@@ -1094,10 +1094,10 @@ createpointer(struct wlr_pointer *pointer)
 			libinput_device_config_middle_emulation_set_enabled(device, middle_button_emulation);
 
 		if (libinput_device_config_scroll_get_methods(device) != LIBINPUT_CONFIG_SCROLL_NO_SCROLL)
-			libinput_device_config_scroll_set_method (device, scroll_method);
+			libinput_device_config_scroll_set_method(device, scroll_method);
 
 		if (libinput_device_config_click_get_methods(device) != LIBINPUT_CONFIG_CLICK_METHOD_NONE)
-			libinput_device_config_click_set_method (device, click_method);
+			libinput_device_config_click_set_method(device, click_method);
 
 		if (libinput_device_config_send_events_get_modes(device))
 			libinput_device_config_send_events_set_mode(device, send_events_mode);
