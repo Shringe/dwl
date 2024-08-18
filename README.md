@@ -1,7 +1,7 @@
 # dwl - dwm for Wayland
 
 Join us on our IRC channel: [#dwl on Libera Chat]  
-Or on our [Discord server].
+Or on the community-maintained [Discord server].
 
 dwl is a compact, hackable compositor for [Wayland] based on [wlroots]. It is
 intended to fill the same space in the Wayland world that dwm does in X11,
