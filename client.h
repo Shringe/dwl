@@ -358,8 +358,11 @@ static inline void
 client_set_tiled(Client *c, uint32_t edges)
 {
 #ifdef XWAYLAND
-	if (client_is_x11(c))
+	if (client_is_x11(c)) {
+		wlr_xwayland_surface_set_maximized(c->surface.xwayland,
+				edges != WLR_EDGE_NONE, edges != WLR_EDGE_NONE);
 		return;
+  }
 #endif
 	if (wl_resource_get_version(c->surface.xdg->toplevel->resource)
 			>= XDG_TOPLEVEL_STATE_TILED_RIGHT_SINCE_VERSION) {
