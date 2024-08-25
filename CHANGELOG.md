@@ -12,6 +12,9 @@
 ### Deprecated
 ### Removed
 ### Fixed
+
+* Crash when a client is created while all outputs are disabled.
+
 ### Security
 ### Contributors
 
