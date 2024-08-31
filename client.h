@@ -332,7 +332,8 @@ client_set_fullscreen(Client *c, int fullscreen)
 }
 
 static inline void
-client_set_scale(struct wlr_surface *s, float scale) {
+client_set_scale(struct wlr_surface *s, float scale)
+{
 	wlr_fractional_scale_v1_notify_scale(s, scale);
 	wlr_surface_set_preferred_buffer_scale(s, (int32_t)ceilf(scale));
 }
