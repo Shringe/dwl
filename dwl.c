@@ -2082,6 +2082,7 @@ powermgrsetmode(struct wl_listener *listener, void *data)
 	wlr_output_commit_state(m->wlr_output, &state);
 
 	m->asleep = !event->mode;
+	updatemons(NULL, NULL);
 }
 
 void
