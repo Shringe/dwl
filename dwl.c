@@ -1486,22 +1486,10 @@ gpureset(struct wl_listener *listener, void *data)
 void
 handlesig(int signo)
 {
-	if (signo == SIGCHLD) {
-#ifdef XWAYLAND
-		siginfo_t in;
-		/* wlroots expects to reap the XWayland process itself, so we
-		 * use WNOWAIT to keep the child waitable until we know it's not
-		 * XWayland.
-		 */
-		while (!waitid(P_ALL, 0, &in, WEXITED|WNOHANG|WNOWAIT) && in.si_pid
-				&& (!xwayland || in.si_pid != xwayland->server->pid))
-			waitpid(in.si_pid, NULL, 0);
-#else
+	if (signo == SIGCHLD)
 		while (waitpid(-1, NULL, WNOHANG) > 0);
-#endif
-	} else if (signo == SIGINT || signo == SIGTERM) {
+	else if (signo == SIGINT || signo == SIGTERM)
 		quit(NULL);
-	}
 }
 
 void
