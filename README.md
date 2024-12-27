@@ -103,7 +103,7 @@ automatically, you will need to configure it prior to launching `dwl`, e.g.:
 
 Information about selected layouts, current window title, app-id, and
 selected/occupied/urgent tags is written to the stdin of the `-s` command (see
-the `printstatus()` function for details).  This information can be used to
+the `STATUS INFORMATION` section in `_dwl_(1)`).  This information can be used to
 populate an external status bar with a script that parses the
 information. Failing to read this information will cause dwl to block, so if you
 do want to run a startup command that does not consume the status information,
