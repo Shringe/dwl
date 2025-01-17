@@ -1176,6 +1176,7 @@ destroydragicon(struct wl_listener *listener, void *data)
 	/* Focus enter isn't sent during drag, so refocus the focused node. */
 	focusclient(focustop(selmon), 1);
 	motionnotify(0, NULL, 0, 0, 0, 0);
+	wl_list_remove(&listener->link);
 }
 
 void
@@ -1184,6 +1185,7 @@ destroyidleinhibitor(struct wl_listener *listener, void *data)
 	/* `data` is the wlr_surface of the idle inhibitor being destroyed,
 	 * at this point the idle inhibitor is still in the list of the manager */
 	checkidleinhibitor(wlr_surface_get_root_surface(data));
+	wl_list_remove(&listener->link);
 }
 
 void
