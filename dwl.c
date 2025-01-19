@@ -1367,10 +1367,10 @@ destroykeyboardgroup(struct wl_listener *listener, void *data)
 {
 	KeyboardGroup *group = wl_container_of(listener, group, destroy);
 	wl_event_source_remove(group->key_repeat_source);
-	wlr_keyboard_group_destroy(group->wlr_group);
 	wl_list_remove(&group->key.link);
 	wl_list_remove(&group->modifiers.link);
 	wl_list_remove(&group->destroy.link);
+	wlr_keyboard_group_destroy(group->wlr_group);
 	free(group);
 }
 
