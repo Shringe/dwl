@@ -11,7 +11,7 @@ DATADIR = $(PREFIX)/share
 WLR_INCS = `$(PKG_CONFIG) --cflags wlroots-0.19`
 WLR_LIBS = `$(PKG_CONFIG) --libs wlroots-0.19`
 
-# Allow using an alternative wlroots installations
+# Allow using an alternative wlroots installation
 # This has to have all the includes required by wlroots, e.g:
 # Assuming wlroots git repo is "${PWD}/wlroots" and you only ran "meson setup build && ninja -C build"
 #WLR_INCS = -I/usr/include/pixman-1 -I/usr/include/elogind -I/usr/include/libdrm \
