@@ -25,6 +25,12 @@
         wayland-scanner
       ];
     in rec {
+      overlays = [
+        (self: super: {
+          sdwl = packages.dwl;
+        })
+      ];
+
       devShells.default = pkgs.mkShell {
         name = "dwl";
         buildInputs = buildDeps;
