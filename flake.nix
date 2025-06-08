@@ -62,6 +62,11 @@
           xdg-desktop-portal
           xdg-desktop-portal-wlr
           xdg-desktop-portal-gtk
+
+          # For patches
+          fcft
+          tllist
+          libdrm
         ];
 
         outputs = [
