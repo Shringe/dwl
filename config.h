@@ -6,7 +6,7 @@
 /* appearance */
 static const int sloppyfocus               = 1;  /* focus follows mouse */
 static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
-static const unsigned int borderpx         = 1;  /* border pixel of windows */
+static const unsigned int borderpx         = 2;  /* border pixel of windows */
 static const int showbar                   = 1; /* 0 means no bar */
 static const int topbar                    = 1; /* 0 means bottom bar */
 static const char *fonts[]                 = {"monospace:size=10"};
@@ -132,13 +132,19 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 /* commands */
 static const char *termcmd[] = { "wezterm", NULL };
 // static const char *menucmd[] = { "wofi --show drun", NULL };
-static const char *menucmd[] = { "wofi", "--show", "drun", NULL };
 static const char *browsercmd[] = { "firefox", NULL };
+
+static const char *menucmd[] = { "wofi", "--show", "drun", NULL };
+static const char *emojicmd[] = { "wofi-emoji", NULL };
+static const char *cliphistcmd[] = { "sh", "-c", "cliphist list | wofi --dmenu | cliphist decode | wl-copy", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  key                 function        argument */
 	{ MODKEY,                    XKB_KEY_s,          spawn,            {.v = menucmd} },
+	{ MODKEY,                    XKB_KEY_c,          spawn,            {.v = emojicmd} },
+	{ MODKEY,                    XKB_KEY_d,          spawn,            {.v = cliphistcmd} },
+
 	{ MODKEY,                    XKB_KEY_r,          spawn,            {.v = browsercmd} },
 	{ MODKEY,                    XKB_KEY_Return,     spawn,            {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_e,          focusstack,       {.i = +1} },
