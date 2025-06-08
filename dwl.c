@@ -347,6 +347,7 @@ static void requeststartdrag(struct wl_listener *listener, void *data);
 static void requestmonstate(struct wl_listener *listener, void *data);
 static void resize(Client *c, struct wlr_box geo, int interact);
 static void run(char *startup_cmd);
+static void set_adaptive_sync(Monitor *m, int enabled);
 static void setcursor(struct wl_listener *listener, void *data);
 static void setcursorshape(struct wl_listener *listener, void *data);
 static void setfloating(Client *c, int floating);
@@ -366,6 +367,7 @@ static void tile(Monitor *m);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
+static void togglefullscreenadaptivesync(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void unlocksession(struct wl_listener *listener, void *data);
@@ -441,6 +443,8 @@ static Monitor *selmon;
 
 static struct zdwl_ipc_manager_v2_interface dwl_manager_implementation = {.release = dwl_ipc_manager_release, .get_output = dwl_ipc_manager_get_output};
 static struct zdwl_ipc_output_v2_interface dwl_output_implementation = {.release = dwl_ipc_output_release, .set_tags = dwl_ipc_output_set_tags, .set_layout = dwl_ipc_output_set_layout, .set_client_tags = dwl_ipc_output_set_client_tags};
+
+static int fullscreen_adaptive_sync_enabled = 1;
 
 #ifdef XWAYLAND
 static void activatex11(struct wl_listener *listener, void *data);
@@ -2487,6 +2491,31 @@ run(char *startup_cmd)
 }
 
 void
+set_adaptive_sync(Monitor *m, int enable)
+{
+	struct wlr_output_state state;
+	struct wlr_output_configuration_v1 *config;
+	struct wlr_output_configuration_head_v1 *config_head;
+
+	if (!m || !m->wlr_output || !m->wlr_output->enabled
+			|| !fullscreen_adaptive_sync_enabled)
+		return;
+
+	config = wlr_output_configuration_v1_create();
+	config_head = wlr_output_configuration_head_v1_create(config, m->wlr_output);
+
+	/* Set and commit the adaptive sync state change */
+	wlr_output_state_init(&state);
+	wlr_output_state_set_adaptive_sync_enabled(&state, enable);
+	wlr_output_commit_state(m->wlr_output, &state);
+	wlr_output_state_finish(&state);
+
+	/* Broadcast the adaptive sync state change to output_mgr */
+	config_head->state.adaptive_sync_enabled = enable;
+	wlr_output_manager_v1_set_configuration(output_mgr, config);
+}
+
+void
 setcursor(struct wl_listener *listener, void *data)
 {
 	/* This event is raised by the seat when a client provides a cursor image */
@@ -2549,10 +2578,12 @@ setfullscreen(Client *c, int fullscreen)
 	if (fullscreen) {
 		c->prev = c->geom;
 		resize(c, c->mon->m, 0);
+		set_adaptive_sync(c->mon, 1);
 	} else {
 		/* restore previous size instead of arrange for floating windows since
 		 * client positions are set by the user and cannot be recalculated */
 		resize(c, c->prev, 0);
+		set_adaptive_sync(c->mon, 0);
 	}
 	arrange(c->mon);
 	printstatus();
@@ -2966,6 +2997,12 @@ togglefullscreen(const Arg *arg)
 }
 
 void
+togglefullscreenadaptivesync(const Arg *arg)
+{
+	fullscreen_adaptive_sync_enabled = !fullscreen_adaptive_sync_enabled;
+}
+
+void
 toggletag(const Arg *arg)
 {
 	uint32_t newtags;
@@ -3035,6 +3072,9 @@ unmapnotify(struct wl_listener *listener, void *data)
 		setmon(c, NULL, 0);
 		wl_list_remove(&c->flink);
 	}
+	/* Toggle adaptive sync off when fullscreen client is unmapped */
+	if (c->isfullscreen)
+		set_adaptive_sync(selmon, 0);
 
 	wlr_scene_node_destroy(&c->scene->node);
 	printstatus();
