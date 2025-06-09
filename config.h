@@ -55,7 +55,7 @@ static const MonitorRule monrules[] = {
 	*/
 	/* defaults */
 	{ "HDMI-A-1", 0.5f,  1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL, 2560, 0, 0, 0, 0.0f, 5, 0},
-	{ "DP-1",     0.5f,  2,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL, 0, 0, 0, 0, 0.0f, 1, 1},
+	{ "DP-1",     0.5f,  2,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL, 0, 0, 0, 0, 0.0f, 1, 0},
 	{ NULL,       0.55f, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL, -1, -1, 0, 0, 0.0f, 0 ,1},
 };
 
