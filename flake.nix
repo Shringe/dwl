@@ -38,7 +38,7 @@
 
       packages.dwl = pkgs.stdenv.mkDerivation (finalAttrs: {
         pname = "dwl";
-        version = "unstable";
+        version = "0.7";
         src = ./.;
 
         nativeBuildInputs = with pkgs; [
