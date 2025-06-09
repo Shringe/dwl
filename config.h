@@ -129,29 +129,86 @@ static const int cursor_timeout = 5;
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
+// Media
+static const char *volumeup[]             = { "pactl", "set-sink-volume",   "@DEFAULT_SINK@",   "+5%",    NULL };
+static const char *volumedown[]           = { "pactl", "set-sink-volume",   "@DEFAULT_SINK@",   "-5%",    NULL };
+static const char *volumemute[]           = { "pactl", "set-sink-mute",     "@DEFAULT_SINK@",   "toggle", NULL };
+
+static const char *micvolup[]             = { "pactl", "set-source-volume", "@DEFAULT_SOURCE@", "+5%",    NULL };
+static const char *micvoldown[]           = { "pactl", "set-source-volume", "@DEFAULT_SOURCE@", "-5%",    NULL };
+static const char *micvolmute[]           = { "pactl", "set-source-mute",   "@DEFAULT_SOURCE@", "toggle", NULL };
+
+static const char *brightnessup[]         = { "brightnessctl", "set",       "5%+",              NULL };
+static const char *brightnessdown[]       = { "brightnessctl", "set",       "5%-",              NULL };
+
+static const char *playershuffletoggle[]  = { "playerctl", "shuffle",       "Toggle",           NULL };
+static const char *playerlooptrack[]      = { "playerctl", "loop",          "Track",            NULL };
+static const char *playerloopnone[]       = { "playerctl", "loop",          "None",             NULL };
+static const char *playerloopplaylist[]   = { "playerctl", "loop",          "Playlist",         NULL };
+
+static const char *playervolup[]          = { "playerctl", "volume",        "0.1+",             NULL };
+static const char *playervoldown[]        = { "playerctl", "volume",        "0.1-",             NULL };
+static const char *playervolmute[]        = { "playerctl", "volume",        "0"   ,             NULL };
+
+static const char *playerplaypause[]      = { "playerctl", "play-pause",    NULL };
+static const char *playernext[]           = { "playerctl", "next",          NULL };
+static const char *playerprev[]           = { "playerctl", "previous",      NULL };
+
+// Menus
+static const char *menucmd[] = { "wofi", "--show", "drun", NULL };
+static const char *emojicmd[] = { "wofi-emoji", NULL };
+static const char *cliphistcmd[] = { "sh", "-c", 
+  "cliphist list | wofi --dmenu | cliphist decode | wl-copy", NULL };
+
+// Apps
 static const char *termcmd[] = { "wezterm", NULL };
 static const char *browsercmd[] = { "firefox", NULL };
 
-static const char *menucmd[] = { "wofi", "--show", "drun", NULL };
-static const char *emojicmd[] = { "wofi-emoji", NULL };
-static const char *cliphistcmd[] = { "sh", "-c", "cliphist list | wofi --dmenu | cliphist decode | wl-copy", NULL };
-
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
-	/* modifier                  key                 function        argument */
-	{ MODKEY,                    XKB_KEY_s,          spawn,            {.v = menucmd} },
-	{ MODKEY,                    XKB_KEY_c,          spawn,            {.v = emojicmd} },
-	{ MODKEY,                    XKB_KEY_d,          spawn,            {.v = cliphistcmd} },
+	/* modifier                  key                 function          argument */
+  // Media
+  { 0,  XKB_KEY_XF86AudioRaiseVolume,                  spawn,        {.v = volumeup } },
+  { 0,  XKB_KEY_XF86AudioLowerVolume,                  spawn,        {.v = volumedown } },
+  { 0,  XKB_KEY_XF86AudioMute,                         spawn,        {.v = volumemute } },
 
-	{ MODKEY,                    XKB_KEY_r,          spawn,            {.v = browsercmd} },
-	{ MODKEY,                    XKB_KEY_Return,     spawn,            {.v = termcmd} },
+  { WLR_MODIFIER_CTRL,  XKB_KEY_XF86AudioRaiseVolume,  spawn,        {.v = micvolup } },
+  { WLR_MODIFIER_CTRL,  XKB_KEY_XF86AudioLowerVolume,  spawn,        {.v = micvoldown } },
+  { WLR_MODIFIER_CTRL,  XKB_KEY_XF86AudioMute,         spawn,        {.v = micvolmute } },
+
+  { 0,  XKB_KEY_XF86MonBrightnessUp,                   spawn,        {.v = brightnessup } },
+  { 0,  XKB_KEY_XF86MonBrightnessDown,                 spawn,        {.v = brightnessdown } },
+
+  { WLR_MODIFIER_SHIFT, XKB_KEY_XF86MonBrightnessUp,   spawn,        {.v = playershuffletoggle } },
+  { WLR_MODIFIER_SHIFT, XKB_KEY_XF86MonBrightnessDown, spawn,        {.v = playerlooptrack } },
+  { WLR_MODIFIER_CTRL,  XKB_KEY_XF86MonBrightnessUp,   spawn,        {.v = playerloopnone } },
+  { WLR_MODIFIER_CTRL,  XKB_KEY_XF86MonBrightnessDown, spawn,        {.v = playerloopplaylist } },
+
+  { WLR_MODIFIER_SHIFT, XKB_KEY_XF86AudioRaiseVolume,  spawn,        {.v = playervolup } },
+  { WLR_MODIFIER_SHIFT, XKB_KEY_XF86AudioLowerVolume,  spawn,        {.v = playervoldown } },
+  { WLR_MODIFIER_SHIFT, XKB_KEY_XF86AudioMute,         spawn,        {.v = playervolmute } },
+
+  { 0,  XKB_KEY_XF86AudioPlay,                         spawn,        {.v = playerplaypause } },
+  { 0,  XKB_KEY_XF86AudioNext,                         spawn,        {.v = playernext } },
+  { 0,  XKB_KEY_XF86AudioPrev,                         spawn,        {.v = playerprev } },
+
+  // Menus
+	{ MODKEY,                    XKB_KEY_s,          spawn,            {.v = menucmd } },
+	{ MODKEY,                    XKB_KEY_c,          spawn,            {.v = emojicmd } },
+	{ MODKEY,                    XKB_KEY_d,          spawn,            {.v = cliphistcmd } },
+
+  // Apps
+	{ MODKEY,                    XKB_KEY_r,          spawn,            {.v = browsercmd } },
+	{ MODKEY,                    XKB_KEY_Return,     spawn,            {.v = termcmd } },
+
+  // DWL
 	{ MODKEY,                    XKB_KEY_e,          focusstack,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_i,          focusstack,       {.i = -1} },
 	{ MODKEY,                    XKB_KEY_n,          incnmaster,       {.i = +1} },
 	{ MODKEY,                    XKB_KEY_o,          incnmaster,       {.i = -1} },
 	{ MODKEY,                    XKB_KEY_l,          setmfact,         {.f = -0.05f} },
 	{ MODKEY,                    XKB_KEY_u,          setmfact,         {.f = +0.05f} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,     zoom,             {0} },
+	{ MODKEY,                    XKB_KEY_y,          zoom,             {0} },
 	{ MODKEY,                    XKB_KEY_Tab,        view,             {0} },
 	{ MODKEY,                    XKB_KEY_w,          killclient,       {0} },
 	{ MODKEY,                    XKB_KEY_j,          setlayout,        {.v = &layouts[0]} },
@@ -160,8 +217,8 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_space,      setlayout,        {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating,   {0} },
 	{ MODKEY,                    XKB_KEY_t,          togglefullscreen, {0} },
-	{ MODKEY,                    XKB_KEY_F5,        togglefullscreenadaptivesync, {0} },
-	{ MODKEY,                    XKB_KEY_g,          togglegaps,     {0} },
+	{ MODKEY,                    XKB_KEY_F5,         togglefullscreenadaptivesync, {0} },
+	{ MODKEY,                    XKB_KEY_g,          togglegaps,       {0} },
 	{ MODKEY,                    XKB_KEY_0,          view,             {.ui = ~0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_parenright, tag,              {.ui = ~0} },
 	{ MODKEY,                    XKB_KEY_comma,      focusmon,         {.i = WLR_DIRECTION_LEFT} },
