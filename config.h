@@ -129,6 +129,13 @@ static const int cursor_timeout = 5;
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
+// Screenshots
+static const char *screenshot_fullscreen[] = { "sh", "-c",
+  "grim \"$HOME/Pictures/screenshots/dwl/$(date +%Y-%m-%d_%H-%m-%s).png\"", NULL };
+
+static const char *screenshot_selection[] = { "sh", "-c",
+  "grim -g \"$(slurp)\" \"$HOME/Pictures/screenshots/dwl/$(date +%Y-%m-%d_%H-%m-%s).png\"", NULL };
+
 // Media
 static const char *volumeup[]             = { "pactl", "set-sink-volume",   "@DEFAULT_SINK@",   "+5%",    NULL };
 static const char *volumedown[]           = { "pactl", "set-sink-volume",   "@DEFAULT_SINK@",   "-5%",    NULL };
@@ -167,6 +174,10 @@ static const char *browsercmd[] = { "firefox", NULL };
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  key                 function          argument */
+  // Screenshots
+  { 0,                         XKB_KEY_Print,      spawn,            {.v = screenshot_fullscreen } },
+  { WLR_MODIFIER_SHIFT,        XKB_KEY_Print,      spawn,            {.v = screenshot_selection } },
+
   // Media
   { 0,  XKB_KEY_XF86AudioRaiseVolume,                  spawn,        {.v = volumeup } },
   { 0,  XKB_KEY_XF86AudioLowerVolume,                  spawn,        {.v = volumedown } },
