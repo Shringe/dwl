@@ -169,7 +169,8 @@ static const char *cliphistcmd[] = { "sh", "-c",
 
 // Apps
 static const char *termcmd[] = { "wezterm", NULL };
-static const char *browsercmd[] = { "firefox", NULL };
+static const char *browsercmd[] = { "zen", NULL };
+static const char *notescmd[] = { "joplin-desktop", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
@@ -209,6 +210,7 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_d,          spawn,            {.v = cliphistcmd } },
 
   // Apps
+	{ MODKEY,                    XKB_KEY_a,          spawn,            {.v = notescmd } },
 	{ MODKEY,                    XKB_KEY_r,          spawn,            {.v = browsercmd } },
 	{ MODKEY,                    XKB_KEY_Return,     spawn,            {.v = termcmd } },
 
