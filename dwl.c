@@ -285,6 +285,7 @@ static void destroysessionlock(struct wl_listener *listener, void *data);
 static void destroysessionmgr(struct wl_listener *listener, void *data);
 static void destroykeyboardgroup(struct wl_listener *listener, void *data);
 static Monitor *dirtomon(enum wlr_direction dir);
+static Client *firstfocused(void);
 static void focusclient(Client *c, int lift);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
@@ -601,10 +602,14 @@ buttonpress(struct wl_listener *listener, void *data)
 	struct wlr_pointer_button_event *event = data;
 	struct wlr_keyboard *keyboard;
 	uint32_t mods;
-	Client *c;
+	Client *c, *focused;
 	const Button *b;
 
 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+
+	focused = firstfocused();
+	if (focused && focused->isfullscreen)
+		goto skip_click;
 
 	switch (event->state) {
 	case WL_POINTER_BUTTON_STATE_PRESSED:
@@ -645,6 +650,7 @@ buttonpress(struct wl_listener *listener, void *data)
 	}
 	/* If the event wasn't handled by the compositor, notify the client with
 	 * pointer focus that a button press has occurred */
+skip_click:
 	wlr_seat_pointer_notify_button(seat,
 			event->time_msec, event->button, event->state);
 }
@@ -1339,6 +1345,13 @@ dirtomon(enum wlr_direction dir)
 	return selmon;
 }
 
+Client *
+firstfocused(void)
+{
+	Client *c = wl_container_of(fstack.next, c, flink);
+	return c;
+}
+
 void
 focusclient(Client *c, int lift)
 {
@@ -1565,10 +1578,18 @@ keybinding(uint32_t mods, xkb_keysym_t sym)
 	 * processing keys, rather than passing them on to the client for its own
 	 * processing.
 	 */
+	Client *c = firstfocused();
 	const Key *k;
 	for (k = keys; k < END(keys); k++) {
 		if (CLEANMASK(mods) == CLEANMASK(k->mod)
 				&& sym == k->keysym && k->func) {
+			if (c && c->isfullscreen) {
+				if (k->func == togglefullscreen) {
+					k->func(&k->arg);
+					return 1;
+				}
+				return 0;
+			}
 			k->func(&k->arg);
 			return 1;
 		}
