@@ -341,6 +341,7 @@ static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
+static void togglefullscreenkeyinhibit(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void unlocksession(struct wl_listener *listener, void *data);
@@ -413,6 +414,8 @@ static struct wlr_output_layout *output_layout;
 static struct wlr_box sgeom;
 static struct wl_list mons;
 static Monitor *selmon;
+
+static int fullscreen_key_inhibit_enabled = 1;
 
 #ifdef XWAYLAND
 static void activatex11(struct wl_listener *listener, void *data);
@@ -1583,8 +1586,10 @@ keybinding(uint32_t mods, xkb_keysym_t sym)
 	for (k = keys; k < END(keys); k++) {
 		if (CLEANMASK(mods) == CLEANMASK(k->mod)
 				&& sym == k->keysym && k->func) {
-			if (c && c->isfullscreen) {
-				if (k->func == togglefullscreen) {
+			if (fullscreen_key_inhibit_enabled
+        && c && c->isfullscreen) {
+				if (k->func == togglefullscreenkeyinhibit
+          || k->func == togglefullscreen) {
 					k->func(&k->arg);
 					return 1;
 				}
@@ -2761,6 +2766,12 @@ togglefullscreen(const Arg *arg)
 	Client *sel = focustop(selmon);
 	if (sel)
 		setfullscreen(sel, !sel->isfullscreen);
+}
+
+void
+togglefullscreenkeyinhibit(const Arg *arg)
+{
+  fullscreen_key_inhibit_enabled = !fullscreen_key_inhibit_enabled;
 }
 
 void
