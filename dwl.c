@@ -1880,8 +1880,7 @@ keybinding(uint32_t mods, xkb_keysym_t sym)
 				&& sym == k->keysym && k->func) {
 			if (fullscreen_key_inhibit_enabled
         && c && c->isfullscreen) {
-				if (k->func == togglefullscreenkeyinhibit
-          || k->func == togglefullscreen) {
+				if (k->func == togglefullscreenkeyinhibit) {
 					k->func(&k->arg);
 					return 1;
 				}
