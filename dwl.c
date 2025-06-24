@@ -1876,7 +1876,7 @@ keybinding(uint32_t mods, xkb_keysym_t sym)
 		if (CLEANMASK(mods) == CLEANMASK(k->mod)
 				&& sym == k->keysym && k->func) {
 			if (c && c->isfullscreen) {
-				if (k->func == togglefullscreen || k->func == chvt) {
+				if (k->func == togglefullscreen) {
 					k->func(&k->arg);
 					return 1;
 				}
