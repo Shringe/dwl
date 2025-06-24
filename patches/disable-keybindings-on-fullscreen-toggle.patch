@@ -1,4 +1,4 @@
-From b1ec6d07f148c940422e77baeb49a9af3d21fa5e Mon Sep 17 00:00:00 2001
+From 500fe40103d4bd89aeebac0af071fa5092218cb4 Mon Sep 17 00:00:00 2001
 From: Shringe <dashingkoso@gmail.com>
 Date: Mon, 23 Jun 2025 18:50:40 -0500
 Subject: [PATCH] Implemented functionality for patch
@@ -9,14 +9,14 @@ Subject: [PATCH] Implemented functionality for patch
  2 files changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/config.def.h b/config.def.h
-index 22d2171..a718855 100644
+index 22d2171..dda4ad0 100644
 --- a/config.def.h
 +++ b/config.def.h
 @@ -142,6 +142,7 @@ static const Key keys[] = {
  	{ MODKEY,                    XKB_KEY_space,      setlayout,      {0} },
  	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating, {0} },
  	{ MODKEY,                    XKB_KEY_e,         togglefullscreen, {0} },
-+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_g,         togglefullscreenkeyinhibit, {0} },
++	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_G,         togglefullscreenkeyinhibit, {0} },
  	{ MODKEY,                    XKB_KEY_0,          view,           {.ui = ~0} },
  	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_parenright, tag,            {.ui = ~0} },
  	{ MODKEY,                    XKB_KEY_comma,      focusmon,       {.i = WLR_DIRECTION_LEFT} },
