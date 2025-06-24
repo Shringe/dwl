@@ -68,7 +68,7 @@ index ec4ca86..8c771e8 100644
  		if (CLEANMASK(mods) == CLEANMASK(k->mod)
  				&& sym == k->keysym && k->func) {
 +			if (c && c->isfullscreen) {
-+				if (k->func == togglefullscreen || k->func == chvt) {
++				if (k->func == togglefullscreen) {
 +					k->func(&k->arg);
 +					return 1;
 +				}
