@@ -372,6 +372,7 @@ static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
 static void togglefullscreenadaptivesync(const Arg *arg);
+static void togglefullscreenkeyinhibit(const Arg *arg);
 static void togglegaps(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
@@ -459,6 +460,8 @@ static struct zdwl_ipc_manager_v2_interface dwl_manager_implementation = {.relea
 static struct zdwl_ipc_output_v2_interface dwl_output_implementation = {.release = dwl_ipc_output_release, .set_tags = dwl_ipc_output_set_tags, .set_layout = dwl_ipc_output_set_layout, .set_client_tags = dwl_ipc_output_set_client_tags};
 
 static int fullscreen_adaptive_sync_enabled = 1;
+
+static int fullscreen_key_inhibit_enabled = 1;
 
 #ifdef XWAYLAND
 static void activatex11(struct wl_listener *listener, void *data);
@@ -1875,8 +1878,10 @@ keybinding(uint32_t mods, xkb_keysym_t sym)
 	for (k = keys; k < END(keys); k++) {
 		if (CLEANMASK(mods) == CLEANMASK(k->mod)
 				&& sym == k->keysym && k->func) {
-			if (c && c->isfullscreen) {
-				if (k->func == togglefullscreen) {
+			if (fullscreen_key_inhibit_enabled
+        && c && c->isfullscreen) {
+				if (k->func == togglefullscreenkeyinhibit
+          || k->func == togglefullscreen) {
 					k->func(&k->arg);
 					return 1;
 				}
@@ -3107,6 +3112,12 @@ togglegaps(const Arg *arg)
 {
 	selmon->gaps = !selmon->gaps;
 	arrange(selmon);
+}
+
+void
+togglefullscreenkeyinhibit(const Arg *arg)
+{
+  fullscreen_key_inhibit_enabled = !fullscreen_key_inhibit_enabled;
 }
 
 void
