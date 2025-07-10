@@ -65,6 +65,19 @@
               version = "0.7";
               src = ./.;
 
+              postInstall = ''
+                mkdir -p $out/share/wayland-sessions
+                cat > $out/share/wayland-sessions/sdwl.desktop << EOF
+                [Desktop Entry]
+                Name=sdwl
+                Comment=dwl with session management
+                Exec=sdwl
+                Type=Application
+                EOF
+              '';
+
+              passthru.providedSessions = [ "sdwl" ];
+
               nativeBuildInputs = with pkgs; [
                 installShellFiles
                 pkg-config
