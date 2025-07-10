@@ -4,7 +4,7 @@
     flake-utils = { url = "github:numtide/flake-utils"; };
   };
 
-  outputs = { nixpkgs, ... }@inputs: 
+  outputs = { self, nixpkgs, ... }@inputs: 
     let
       systemOutputs = inputs.flake-utils.lib.eachDefaultSystem (system:
         let
@@ -63,7 +63,7 @@
             dwl = pkgs.stdenv.mkDerivation (finalAttrs: {
               pname = "dwl";
               version = "0.7";
-              src = ./.;
+              src = self;
 
               postInstall = ''
                 mkdir -p $out/share/wayland-sessions
