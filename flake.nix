@@ -36,67 +36,88 @@
         packages = [ packages.dwl ];
       };
 
-      packages.dwl = pkgs.stdenv.mkDerivation (finalAttrs: {
-        pname = "dwl";
-        version = "0.7";
-        src = ./.;
-
-        nativeBuildInputs = with pkgs; [
-          installShellFiles
-          pkg-config
-          wayland-scanner
-        ];
-
-        buildInputs = with pkgs; [
-          libinput
-          xorg.libxcb
-          libxkbcommon
-          pixman
-          wayland
-          wayland-protocols
-          wlroots_package
-          xorg.libX11
-          xorg.xcbutilwm
-          xwayland
-
-          xdg-desktop-portal
-          xdg-desktop-portal-wlr
-          xdg-desktop-portal-gtk
-
-          # For patches
-          fcft
-          tllist
-          libdrm
-        ];
-
-        outputs = [
-          "out"
-          "man"
-        ];
-
-        makeFlags = [
-          "PKG_CONFIG=${pkgs.stdenv.cc.targetPrefix}pkg-config"
-          "WAYLAND_SCANNER=wayland-scanner"
-          "PREFIX=$(out)"
-          "MANDIR=$(man)/share/man"
-          ''XWAYLAND="-DXWAYLAND"''
-          ''XLIBS="xcb xcb-icccm"''
-        ];
-
-        strictDeps = true;
-
-        # required for whitespaces in makeFlags
-        __structuredAttrs = true;
-
-        meta = {
-          homepage = "https://codeberg.org/dwl/dwl";
-          description = "Dynamic window manager for Wayland";
-          inherit (pkgs.wayland.meta) platforms;
-          mainProgram = "dwl";
+      packages = {
+        autostartDwl = pkgs.writeShellApplication {
+          name = "autostartDwl";
+          text = ''
+            systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+            systemctl --user start dwl-session.target
+          '';
         };
-      });
 
-      packages.default = packages.dwl;
+        sdwl = pkgs.writeShellApplication {
+          name = "sdwl";
+          runtimeInputs = with packages; [
+            autostartDwl
+            dwl
+          ];
+
+          text = ''
+            dwl -s "autostartDwl" ; systemctl --user stop dwl-session.target
+          '';
+        };
+
+        default = packages.dwl;
+        dwl = pkgs.stdenv.mkDerivation (finalAttrs: {
+          pname = "dwl";
+          version = "0.7";
+          src = ./.;
+
+          nativeBuildInputs = with pkgs; [
+            installShellFiles
+            pkg-config
+            wayland-scanner
+          ];
+
+          buildInputs = with pkgs; [
+            libinput
+            xorg.libxcb
+            libxkbcommon
+            pixman
+            wayland
+            wayland-protocols
+            wlroots_package
+            xorg.libX11
+            xorg.xcbutilwm
+            xwayland
+
+            xdg-desktop-portal
+            xdg-desktop-portal-wlr
+            xdg-desktop-portal-gtk
+
+            # For patches
+            fcft
+            tllist
+            libdrm
+          ];
+
+          outputs = [
+            "out"
+            "man"
+          ];
+
+          makeFlags = [
+            "PKG_CONFIG=${pkgs.stdenv.cc.targetPrefix}pkg-config"
+            "WAYLAND_SCANNER=wayland-scanner"
+            "PREFIX=$(out)"
+            "MANDIR=$(man)/share/man"
+            ''XWAYLAND="-DXWAYLAND"''
+            ''XLIBS="xcb xcb-icccm"''
+          ];
+
+          strictDeps = true;
+
+          # required for whitespaces in makeFlags
+          __structuredAttrs = true;
+
+          meta = {
+            homepage = "https://codeberg.org/dwl/dwl";
+            description = "Dynamic window manager for Wayland";
+            inherit (pkgs.wayland.meta) platforms;
+            mainProgram = "dwl";
+          };
+        });
+      };
     }
   );
 }
