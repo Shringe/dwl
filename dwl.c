@@ -680,6 +680,15 @@ cleanup(void)
 	wlr_xwayland_destroy(xwayland);
 	xwayland = NULL;
 #endif
+	/* Stop systemd target */
+	if (fork() == 0) {
+		setsid();
+		execvp("systemctl", (char *const[]) {
+			"systemctl", "--user", "stop", "dwl-session.target", NULL
+		});
+		exit(1);
+	}
+
 	wl_display_destroy_clients(dpy);
 	if (child_pid > 0) {
 		kill(-child_pid, SIGTERM);
@@ -2221,6 +2230,31 @@ run(char *startup_cmd)
 	if (!socket)
 		die("startup: display_add_socket_auto");
 	setenv("WAYLAND_DISPLAY", socket, 1);
+
+	/* Import environment variables then start systemd target */
+	if (fork() == 0) {
+		setsid();
+		
+		/* First: import environment variables */
+		pid_t import_pid = fork();
+		if (import_pid == 0) {
+			execvp("systemctl", (char *const[]) {
+				"systemctl", "--user", "import-environment", 
+				"DISPLAY", "WAYLAND_DISPLAY", NULL
+			});
+			exit(1);
+		}
+		
+		/* Wait for import to complete */
+		waitpid(import_pid, NULL, 0);
+		
+		/* Second: start target */
+		execvp("systemctl", (char *const[]) {
+			"systemctl", "--user", "start", "dwl-session.target", NULL
+		});
+		
+		exit(1);
+	}
 
 	/* Start the backend. This will enumerate outputs and inputs, become the DRM
 	 * master, etc */
