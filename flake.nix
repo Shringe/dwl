@@ -29,16 +29,16 @@
           ];
         in rec {
           overlay = self: super: {
-            dwl = packages.default;
+            dwl = packages.dwl;
           };
 
           devShells.default = pkgs.mkShell {
             name = "dwl";
             buildInputs = buildDeps;
-            packages = [ packages.default ];
+            packages = [ packages.dwl ];
           };
 
-          packages.default = pkgs.stdenv.mkDerivation (finalAttrs: {
+          packages.dwl = pkgs.stdenv.mkDerivation (finalAttrs: {
             pname = "dwl";
             version = "0.7";
             src = self;
@@ -110,6 +110,8 @@
               mainProgram = "dwl";
             };
           });
+
+          packages.default = packages.dwl;
         }
       );
     in systemOutputs // {
