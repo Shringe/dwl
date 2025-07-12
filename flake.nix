@@ -45,13 +45,7 @@
 
             postInstall = ''
               mkdir -p $out/share/wayland-sessions
-              cat > $out/share/wayland-sessions/dwl.desktop << EOF
-              [Desktop Entry]
-              Name=dwl
-              Comment=dwl with systemd --user session management
-              Exec=dwl ; systemctl --user stop dwl-session.target
-              Type=Application
-              EOF
+              cp ./dwl.desktop $out/share/wayland-sessions/
             '';
 
             passthru.providedSessions = [ "dwl" ];
