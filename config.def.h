@@ -12,7 +12,35 @@ static const float bordercolor[]           = COLOR(0x444444ff);
 static const float focuscolor[]            = COLOR(0x005577ff);
 static const float urgentcolor[]           = COLOR(0xff0000ff);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
-static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
+static const float fullscreen_bg[]         = {0.1f, 0.1f, 0.1f, 0.0f}; /* You can also use glsl colors */
+
+static const int opacity = 0; /* flag to enable opacity */
+static const float opacity_inactive = 0.5;
+static const float opacity_active = 1.0;
+
+static const int shadow = 1; /* flag to enable shadow */
+static const int shadow_only_floating = 0; /* only apply shadow to floating windows */
+static const float shadow_color[4] = COLOR(0x0000FFff);
+static const float shadow_color_focus[4] = COLOR(0xFF0000ff);
+static const int shadow_blur_sigma = 20;
+static const int shadow_blur_sigma_focus = 40;
+static const char *const shadow_ignore_list[] = { NULL }; /* list of app-id to ignore */
+
+static const int corner_radius = 8; /* 0 disables corner_radius */
+static const int corner_radius_inner = 9; /* 0 disables corner_radius */
+static const int corner_radius_only_floating = 0; /* only apply corner_radius and corner_radius_inner to floating windows */
+
+static const int blur = 1; /* flag to enable blur */
+static const int blur_xray = 0; /* flag to make transparent fs and floating windows display your background */
+static const int blur_ignore_transparent = 1;
+static const struct blur_data blur_data = {
+	.radius = 5,
+	.num_passes = 3,
+	.noise = (float)0.02,
+	.brightness = (float)0.9,
+	.contrast = (float)0.9,
+	.saturation = (float)1.1,
+};
 
 /* tagging - TAGCOUNT must be no greater than 31 */
 #define TAGCOUNT (9)
