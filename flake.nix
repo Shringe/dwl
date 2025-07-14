@@ -25,6 +25,11 @@
             xorg.libxcb
             xorg.xcbutilwm
             xwayland
+
+            # Patches
+            ## SceneFX
+            scenefx
+            libGL
           ];
         in rec {
           overlay = self: super: {
