@@ -18,8 +18,8 @@ static const float urgentcolor[]           = COLOR(0xf38ba8ff);
 static const float fullscreen_bg[]         = {0.1f, 0.1f, 0.1f, 0.0f}; /* You can also use glsl colors */
 
 static const int opacity = 0; /* flag to enable opacity */
-static const float opacity_inactive = 0.9;
-static const float opacity_active = 1.0;
+static const float opacity_inactive = 0.9f;
+static const float opacity_active = 1.0f;
 
 static const int shadow = 0; /* flag to enable shadow */
 static const int shadow_only_floating = 1; /* only apply shadow to floating windows */
@@ -141,6 +141,8 @@ LIBINPUT_CONFIG_TAP_MAP_LRM -- 1/2/3 finger tap maps to left/right/middle
 LIBINPUT_CONFIG_TAP_MAP_LMR -- 1/2/3 finger tap maps to left/middle/right
 */
 static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TAP_MAP_LRM;
+
+static const int cursor_timeout = 10;
 
 /* If you want to use the windows key for MODKEY, use WLR_MODIFIER_LOGO */
 #define MODKEY WLR_MODIFIER_LOGO
