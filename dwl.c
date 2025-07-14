@@ -89,7 +89,7 @@
 /* enums */
 enum { CurNormal, CurPressed, CurMove, CurResize }; /* cursor */
 enum { XDGShell, LayerShell, X11 }; /* client types */
-enum { LyrBg, LyrBottom, LyrTile, LyrFloat, LyrTop, LyrFS, LyrOverlay, LyrBlock, NUM_LAYERS }; /* scene layers */
+enum { LyrBg, LyrBlur, LyrBottom, LyrTile, LyrFloat, LyrTop, LyrFS, LyrOverlay, LyrBlock, NUM_LAYERS }; /* scene layers */
 
 typedef union {
 	int i;
@@ -2603,7 +2603,7 @@ setup(void)
 	wlr_scene_node_place_below(&drag_icon->node, &layers[LyrBlock]->node);
 
 	if (blur) {
-		wlr_scene_set_blur_data(scene, blur_data);
+		wlr_scene_set_blur_data(scene, blur_data.num_passes, blur_data.radius, blur_data.noise, blur_data.brightness, blur_data.contrast, blur_data.saturation);
 	}
 
 	/* Autocreates a renderer, either Pixman, GLES2 or Vulkan for us. The user
@@ -2717,7 +2717,8 @@ setup(void)
 
 	relative_pointer_mgr = wlr_relative_pointer_manager_v1_create(dpy);
 
-	output_configure_scene(&m->scene_output->scene->tree.node, NULL);
+  // Don't know how to solve error
+	// output_configure_scene(&m->scene_output->scene->tree.node, NULL);
 
 	/*
 	 * Creates a cursor, which is a wlroots utility for tracking the cursor
