@@ -2,6 +2,11 @@
   inputs = {
     nixpkgs = { url = "github:NixOS/nixpkgs/nixos-unstable"; };
     flake-utils = { url = "github:numtide/flake-utils"; };
+
+    scenefx = {
+      url = "github:wlrfx/scenefx";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, ... }@inputs: 
@@ -28,7 +33,8 @@
 
             # Patches
             ## SceneFX
-            scenefx
+            # scenefx # outdated
+            inputs.scenefx.packages.${system}.default
             libGL
           ];
         in rec {
@@ -44,7 +50,7 @@
 
           packages.dwl = pkgs.stdenv.mkDerivation (finalAttrs: {
             pname = "dwl";
-            version = "0.7";
+            version = "main";
             src = self;
 
             postInstall = ''
