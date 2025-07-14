@@ -165,13 +165,13 @@ static const char *screenshot_selection[] = { "sh", "-c",
   "grim -g \"$(slurp)\" \"$HOME/Pictures/screenshots/dwl/$(date +%Y-%m-%d_%H-%m-%s).png\"", NULL };
 
 // Media
-static const char *volumeup[]             = { "wpctl", "set-sink-volume",   "@DEFAULT_SINK@",   "+5%",    NULL };
-static const char *volumedown[]           = { "wpctl", "set-sink-volume",   "@DEFAULT_SINK@",   "-5%",    NULL };
-static const char *volumemute[]           = { "wpctl", "set-sink-mute",     "@DEFAULT_SINK@",   "toggle", NULL };
+static const char *volumeup[]             = { "wpctl", "set-volume",   "@DEFAULT_SINK@",   "5%+",    NULL };
+static const char *volumedown[]           = { "wpctl", "set-volume",   "@DEFAULT_SINK@",   "5%-",    NULL };
+static const char *volumemute[]           = { "wpctl", "set-mute",     "@DEFAULT_SINK@",   "toggle", NULL };
 
-static const char *micvolup[]             = { "wpctl", "set-source-volume", "@DEFAULT_SOURCE@", "+5%",    NULL };
-static const char *micvoldown[]           = { "wpctl", "set-source-volume", "@DEFAULT_SOURCE@", "-5%",    NULL };
-static const char *micvolmute[]           = { "wpctl", "set-source-mute",   "@DEFAULT_SOURCE@", "toggle", NULL };
+static const char *micvolup[]             = { "wpctl", "set-volume",   "@DEFAULT_SOURCE@", "5%+",    NULL };
+static const char *micvoldown[]           = { "wpctl", "set-volume",   "@DEFAULT_SOURCE@", "5%-",    NULL };
+static const char *micvolmute[]           = { "wpctl", "set-mute",     "@DEFAULT_SOURCE@", "toggle", NULL };
 
 static const char *brightnessup[]         = { "brightnessctl", "set",       "5%+",              NULL };
 static const char *brightnessdown[]       = { "brightnessctl", "set",       "5%-",              NULL };
