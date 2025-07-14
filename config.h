@@ -65,6 +65,7 @@ static const Layout layouts[] = {
 	{ "[]=",      tile },
 	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
+	{ "@|@",      snail },
 };
 
 /* monitors */
@@ -91,7 +92,7 @@ static const MonitorRule monrules[] = {
 static const struct xkb_rule_names xkb_rules = {
 	/* can specify fields: rules, model, layout, variant, options */
 	/* example:
-	.options = "ctrl:nocaps",
+	// .options = "ctrl:nocaps",
 	*/
 	.options = NULL,
 };
@@ -255,7 +256,7 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_j,          setlayout,        {.v = &layouts[0]} },
 	{ MODKEY,                    XKB_KEY_m,          setlayout,        {.v = &layouts[1]} },
 	{ MODKEY,                    XKB_KEY_k,          setlayout,        {.v = &layouts[2]} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_J,          setlayout,        {.v = &layouts[3]} },
+	{ MODKEY,                    XKB_KEY_h,          setlayout,        {.v = &layouts[3]} },
 	{ MODKEY,                    XKB_KEY_space,      setlayout,        {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating,   {0} },
 	{ MODKEY,                    XKB_KEY_t,          togglefullscreen, {0} },
