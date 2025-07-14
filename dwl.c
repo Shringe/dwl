@@ -319,6 +319,7 @@ static void dwl_ipc_output_set_client_tags(struct wl_client *client, struct wl_r
 static void dwl_ipc_output_set_layout(struct wl_client *client, struct wl_resource *resource, uint32_t index);
 static void dwl_ipc_output_set_tags(struct wl_client *client, struct wl_resource *resource, uint32_t tagmask, uint32_t toggle_tagset);
 static void dwl_ipc_output_release(struct wl_client *client, struct wl_resource *resource);
+static Client *firstfocused(void);
 static void focusclient(Client *c, int lift);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
@@ -376,6 +377,7 @@ static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
 static void togglefullscreenadaptivesync(const Arg *arg);
+static void togglefullscreenkeyinhibit(const Arg *arg);
 static void togglegaps(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
@@ -496,6 +498,8 @@ static struct zdwl_ipc_manager_v2_interface dwl_manager_implementation = {.relea
 static struct zdwl_ipc_output_v2_interface dwl_output_implementation = {.release = dwl_ipc_output_release, .set_tags = dwl_ipc_output_set_tags, .set_layout = dwl_ipc_output_set_layout, .set_client_tags = dwl_ipc_output_set_client_tags};
 
 static int fullscreen_adaptive_sync_enabled = 1;
+
+static int fullscreen_key_inhibit_enabled = 0;
 
 #ifdef XWAYLAND
 static void activatex11(struct wl_listener *listener, void *data);
@@ -695,10 +699,14 @@ buttonpress(struct wl_listener *listener, void *data)
 	struct wlr_pointer_button_event *event = data;
 	struct wlr_keyboard *keyboard;
 	uint32_t mods;
-	Client *c;
+	Client *c, *focused;
 	const Button *b;
 
 	wlr_idle_notifier_v1_notify_activity(idle_notifier, seat);
+
+	focused = firstfocused();
+	if (focused && focused->isfullscreen)
+		goto skip_click;
 
 	switch (event->state) {
 	case WL_POINTER_BUTTON_STATE_PRESSED:
@@ -739,6 +747,7 @@ buttonpress(struct wl_listener *listener, void *data)
 	}
 	/* If the event wasn't handled by the compositor, notify the client with
 	 * pointer focus that a button press has occurred */
+skip_click:
 	wlr_seat_pointer_notify_button(seat,
 			event->time_msec, event->button, event->state);
 }
@@ -1707,6 +1716,13 @@ dwl_ipc_output_release(struct wl_client *client, struct wl_resource *resource)
 	wl_resource_destroy(resource);
 }
 
+Client *
+firstfocused(void)
+{
+	Client *c = wl_container_of(fstack.next, c, flink);
+	return c;
+}
+
 void
 focusclient(Client *c, int lift)
 {
@@ -1930,10 +1946,19 @@ keybinding(uint32_t mods, xkb_keysym_t sym)
 	 * processing keys, rather than passing them on to the client for its own
 	 * processing.
 	 */
+	Client *c = firstfocused();
 	const Key *k;
 	for (k = keys; k < END(keys); k++) {
 		if (CLEANMASK(mods) == CLEANMASK(k->mod)
 				&& sym == k->keysym && k->func) {
+			if (fullscreen_key_inhibit_enabled
+        && c && c->isfullscreen) {
+				if (k->func == togglefullscreenkeyinhibit) {
+					k->func(&k->arg);
+					return 1;
+				}
+				return 0;
+			}
 			k->func(&k->arg);
 			return 1;
 		}
@@ -3205,6 +3230,12 @@ void
 togglefullscreenadaptivesync(const Arg *arg)
 {
 	fullscreen_adaptive_sync_enabled = !fullscreen_adaptive_sync_enabled;
+}
+
+void
+togglefullscreenkeyinhibit(const Arg *arg)
+{
+  fullscreen_key_inhibit_enabled = !fullscreen_key_inhibit_enabled;
 }
 
 void
