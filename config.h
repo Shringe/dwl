@@ -201,37 +201,34 @@ static const char *termcmd[] = { "wezterm", NULL };
 static const char *browsercmd[] = { "zen", NULL };
 static const char *notescmd[] = { "joplin-desktop", NULL };
 
+// Added to both Dwl in lock-screen!
+#define SHARED_KEYS \
+    /* Media and Audio */ \
+    { 0,  XKB_KEY_XF86AudioRaiseVolume,                  spawn,        {.v = volumeup } }, \
+    { 0,  XKB_KEY_XF86AudioLowerVolume,                  spawn,        {.v = volumedown } }, \
+    { 0,  XKB_KEY_XF86AudioMute,                         spawn,        {.v = volumemute } }, \
+    { WLR_MODIFIER_CTRL,  XKB_KEY_XF86AudioRaiseVolume,  spawn,        {.v = micvolup } }, \
+    { WLR_MODIFIER_CTRL,  XKB_KEY_XF86AudioLowerVolume,  spawn,        {.v = micvoldown } }, \
+    { WLR_MODIFIER_CTRL,  XKB_KEY_XF86AudioMute,         spawn,        {.v = micvolmute } }, \
+    { 0,  XKB_KEY_XF86MonBrightnessUp,                   spawn,        {.v = brightnessup } }, \
+    { 0,  XKB_KEY_XF86MonBrightnessDown,                 spawn,        {.v = brightnessdown } }, \
+    { WLR_MODIFIER_SHIFT, XKB_KEY_XF86MonBrightnessUp,   spawn,        {.v = playershuffletoggle } }, \
+    { WLR_MODIFIER_SHIFT, XKB_KEY_XF86MonBrightnessDown, spawn,        {.v = playerlooptrack } }, \
+    { WLR_MODIFIER_CTRL,  XKB_KEY_XF86MonBrightnessUp,   spawn,        {.v = playerloopnone } }, \
+    { WLR_MODIFIER_CTRL,  XKB_KEY_XF86MonBrightnessDown, spawn,        {.v = playerloopplaylist } }, \
+    { WLR_MODIFIER_SHIFT, XKB_KEY_XF86AudioRaiseVolume,  spawn,        {.v = playervolup } }, \
+    { WLR_MODIFIER_SHIFT, XKB_KEY_XF86AudioLowerVolume,  spawn,        {.v = playervoldown } }, \
+    { WLR_MODIFIER_SHIFT, XKB_KEY_XF86AudioMute,         spawn,        {.v = playervolmute } }, \
+    { 0,  XKB_KEY_XF86AudioPlay,                         spawn,        {.v = playerplaypause } }, \
+    { 0,  XKB_KEY_XF86AudioNext,                         spawn,        {.v = playernext } }, \
+    { 0,  XKB_KEY_XF86AudioPrev,                         spawn,        {.v = playerprev } }, \
+
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  key                 function          argument */
   // Screenshots
   { 0,                         XKB_KEY_Print,      spawn,            {.v = screenshot_fullscreen } },
   { WLR_MODIFIER_SHIFT,        XKB_KEY_Print,      spawn,            {.v = screenshot_selection } },
-
-  // Media
-  { 0,  XKB_KEY_XF86AudioRaiseVolume,                  spawn,        {.v = volumeup } },
-  { 0,  XKB_KEY_XF86AudioLowerVolume,                  spawn,        {.v = volumedown } },
-  { 0,  XKB_KEY_XF86AudioMute,                         spawn,        {.v = volumemute } },
-
-  { WLR_MODIFIER_CTRL,  XKB_KEY_XF86AudioRaiseVolume,  spawn,        {.v = micvolup } },
-  { WLR_MODIFIER_CTRL,  XKB_KEY_XF86AudioLowerVolume,  spawn,        {.v = micvoldown } },
-  { WLR_MODIFIER_CTRL,  XKB_KEY_XF86AudioMute,         spawn,        {.v = micvolmute } },
-
-  { 0,  XKB_KEY_XF86MonBrightnessUp,                   spawn,        {.v = brightnessup } },
-  { 0,  XKB_KEY_XF86MonBrightnessDown,                 spawn,        {.v = brightnessdown } },
-
-  { WLR_MODIFIER_SHIFT, XKB_KEY_XF86MonBrightnessUp,   spawn,        {.v = playershuffletoggle } },
-  { WLR_MODIFIER_SHIFT, XKB_KEY_XF86MonBrightnessDown, spawn,        {.v = playerlooptrack } },
-  { WLR_MODIFIER_CTRL,  XKB_KEY_XF86MonBrightnessUp,   spawn,        {.v = playerloopnone } },
-  { WLR_MODIFIER_CTRL,  XKB_KEY_XF86MonBrightnessDown, spawn,        {.v = playerloopplaylist } },
-
-  { WLR_MODIFIER_SHIFT, XKB_KEY_XF86AudioRaiseVolume,  spawn,        {.v = playervolup } },
-  { WLR_MODIFIER_SHIFT, XKB_KEY_XF86AudioLowerVolume,  spawn,        {.v = playervoldown } },
-  { WLR_MODIFIER_SHIFT, XKB_KEY_XF86AudioMute,         spawn,        {.v = playervolmute } },
-
-  { 0,  XKB_KEY_XF86AudioPlay,                         spawn,        {.v = playerplaypause } },
-  { 0,  XKB_KEY_XF86AudioNext,                         spawn,        {.v = playernext } },
-  { 0,  XKB_KEY_XF86AudioPrev,                         spawn,        {.v = playerprev } },
 
   // Menus
 	{ MODKEY,                    XKB_KEY_s,          spawn,            {.v = menucmd } },
@@ -288,7 +285,16 @@ static const Key keys[] = {
 #define CHVT(n) { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_XF86Switch_VT_##n, chvt, {.ui = (n)} }
 	CHVT(1), CHVT(2), CHVT(3), CHVT(4), CHVT(5), CHVT(6),
 	CHVT(7), CHVT(8), CHVT(9), CHVT(10), CHVT(11), CHVT(12),
+
+  SHARED_KEYS
 };
+
+static const Key lockedkeys[] = {
+	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
+	/* modifier                  key                 function        argument */
+  SHARED_KEYS
+};
+
 
 static const Button buttons[] = {
 	{ MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove} },
