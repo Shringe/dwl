@@ -18,11 +18,11 @@ static const float urgentcolor[]           = COLOR(0xf38ba8ff);
 static const float fullscreen_bg[]         = {0.1f, 0.1f, 0.1f, 0.0f}; /* You can also use glsl colors */
 
 static const int opacity = 0; /* flag to enable opacity */
-static const float opacity_inactive = 0.5;
+static const float opacity_inactive = 0.9;
 static const float opacity_active = 1.0;
 
-static const int shadow = 1; /* flag to enable shadow */
-static const int shadow_only_floating = 0; /* only apply shadow to floating windows */
+static const int shadow = 0; /* flag to enable shadow */
+static const int shadow_only_floating = 1; /* only apply shadow to floating windows */
 static const float shadow_color[4] = COLOR(0x0000FFff);
 static const float shadow_color_focus[4] = COLOR(0xFF0000ff);
 static const int shadow_blur_sigma = 20;
@@ -38,7 +38,7 @@ static const int blur_xray = 0; /* flag to make transparent fs and floating wind
 static const int blur_ignore_transparent = 1;
 static const struct blur_data blur_data = {
 	.radius = 5,
-	.num_passes = 3,
+	.num_passes = 2,
 	.noise = (float)0.02,
 	.brightness = (float)0.9,
 	.contrast = (float)0.9,
@@ -138,7 +138,7 @@ LIBINPUT_CONFIG_TAP_MAP_LMR -- 1/2/3 finger tap maps to left/middle/right
 static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TAP_MAP_LRM;
 
 /* If you want to use the windows key for MODKEY, use WLR_MODIFIER_LOGO */
-#define MODKEY WLR_MODIFIER_ALT
+#define MODKEY WLR_MODIFIER_LOGO
 
 #define TAGKEYS(KEY,SKEY,TAG) \
 	{ MODKEY,                    KEY,            view,            {.ui = 1 << TAG} }, \
@@ -147,7 +147,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT,SKEY,toggletag, {.ui = 1 << TAG} }
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
-#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
+// #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
 // Screenshots
