@@ -2572,6 +2572,8 @@ rendermon(struct wl_listener *listener, void *data)
 	struct wlr_output_state pending = {0};
 	struct timespec now;
 
+	output_configure_scene(&m->scene_output->scene->tree.node, NULL);
+
 	/* Render if no XDG clients have an outstanding resize and are visible on
 	 * this monitor. */
 	wl_list_for_each(c, &clients, link) {
@@ -3097,9 +3099,6 @@ setup(void)
 	wl_signal_add(&pointer_constraints->events.new_constraint, &new_pointer_constraint);
 
 	relative_pointer_mgr = wlr_relative_pointer_manager_v1_create(dpy);
-
-  // Don't know how to solve error
-	// output_configure_scene(&m->scene_output->scene->tree.node, NULL);
 
 	/*
 	 * Creates a cursor, which is a wlroots utility for tracking the cursor
