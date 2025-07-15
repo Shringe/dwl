@@ -166,29 +166,29 @@ static const char *screenshot_selection[] = { "sh", "-c",
   "grim -g \"$(slurp)\" \"$HOME/Pictures/screenshots/dwl/$(date +%Y-%m-%d_%H-%m-%s).png\"", NULL };
 
 // Media
-static const char *volumeup[]             = { "wpctl", "set-volume",   "@DEFAULT_SINK@",   "5%+",    NULL };
-static const char *volumedown[]           = { "wpctl", "set-volume",   "@DEFAULT_SINK@",   "5%-",    NULL };
-static const char *volumemute[]           = { "wpctl", "set-mute",     "@DEFAULT_SINK@",   "toggle", NULL };
+static const char *volumeup[]             = { "swayosd-client", "--output-volume", "raise",       NULL };
+static const char *volumedown[]           = { "swayosd-client", "--output-volume", "lower",       NULL };
+static const char *volumemute[]           = { "swayosd-client", "--output-volume", "mute-toggle", NULL };
 
-static const char *micvolup[]             = { "wpctl", "set-volume",   "@DEFAULT_SOURCE@", "5%+",    NULL };
-static const char *micvoldown[]           = { "wpctl", "set-volume",   "@DEFAULT_SOURCE@", "5%-",    NULL };
-static const char *micvolmute[]           = { "wpctl", "set-mute",     "@DEFAULT_SOURCE@", "toggle", NULL };
+static const char *micvolup[]             = { "swayosd-client", "--input-volume", "raise",        NULL };
+static const char *micvoldown[]           = { "swayosd-client", "--input-volume", "lower",        NULL };
+static const char *micvolmute[]           = { "swayosd-client", "--input-volume", "mute-toggle",  NULL };
 
-static const char *brightnessup[]         = { "brightnessctl", "set",       "5%+",              NULL };
-static const char *brightnessdown[]       = { "brightnessctl", "set",       "5%-",              NULL };
+static const char *brightnessup[]         = { "swayosd-client", "--brightness", "raise", NULL };
+static const char *brightnessdown[]       = { "swayosd-client", "--brightness", "lower", NULL };
 
-static const char *playershuffletoggle[]  = { "playerctl", "shuffle",       "Toggle",           NULL };
-static const char *playerlooptrack[]      = { "playerctl", "loop",          "Track",            NULL };
-static const char *playerloopnone[]       = { "playerctl", "loop",          "None",             NULL };
-static const char *playerloopplaylist[]   = { "playerctl", "loop",          "Playlist",         NULL };
+static const char *playershuffletoggle[]  = { "playerctl", "shuffle", "Toggle",   NULL };
+static const char *playerlooptrack[]      = { "playerctl", "loop",    "Track",    NULL };
+static const char *playerloopnone[]       = { "playerctl", "loop",    "None",     NULL };
+static const char *playerloopplaylist[]   = { "playerctl", "loop",    "Playlist", NULL };
 
-static const char *playervolup[]          = { "playerctl", "volume",        "0.1+",             NULL };
-static const char *playervoldown[]        = { "playerctl", "volume",        "0.1-",             NULL };
-static const char *playervolmute[]        = { "playerctl", "volume",        "0"   ,             NULL };
+static const char *playervolup[]          = { "playerctl", "volume",  "0.1+",     NULL };
+static const char *playervoldown[]        = { "playerctl", "volume",  "0.1-",     NULL };
+static const char *playervolmute[]        = { "playerctl", "volume",  "0"   ,     NULL };
 
-static const char *playerplaypause[]      = { "playerctl", "play-pause",    NULL };
-static const char *playernext[]           = { "playerctl", "next",          NULL };
-static const char *playerprev[]           = { "playerctl", "previous",      NULL };
+static const char *playerplaypause[]      = { "playerctl", "play-pause", NULL };
+static const char *playernext[]           = { "playerctl", "next",       NULL };
+static const char *playerprev[]           = { "playerctl", "previous",   NULL };
 
 // Menus
 static const char *menucmd[] = { "wofi", "--show", "drun", NULL };
