@@ -18,19 +18,19 @@ static const float urgentcolor[]           = COLOR(0xf38ba8ff);
 static const float fullscreen_bg[]         = {0.1f, 0.1f, 0.1f, 0.0f}; /* You can also use glsl colors */
 
 static const int opacity = 0; /* flag to enable opacity */
-static const float opacity_inactive = 0.9f;
-static const float opacity_active = 1.0f;
+static const float opacity_inactive = 0.2f;
+static const float opacity_active = 0.8f;
 
-static const int shadow = 0; /* flag to enable shadow */
+static const int shadow = 1; /* flag to enable shadow */
 static const int shadow_only_floating = 1; /* only apply shadow to floating windows */
-static const float shadow_color[4] = COLOR(0x0000FFff);
-static const float shadow_color_focus[4] = COLOR(0xFF0000ff);
-static const int shadow_blur_sigma = 20;
-static const int shadow_blur_sigma_focus = 40;
+static const float shadow_color[4] = COLOR(0x45475aff);
+static const float shadow_color_focus[4] = COLOR(0x89b4faff);
+static const int shadow_blur_sigma = 5;
+static const int shadow_blur_sigma_focus = 10;
 static const char *const shadow_ignore_list[] = { NULL }; /* list of app-id to ignore */
 
 static const int corner_radius = 8; /* 0 disables corner_radius */
-static const int corner_radius_inner = 9; /* 0 disables corner_radius */
+static const int corner_radius_inner = 10; /* 0 disables corner_radius */
 static const int corner_radius_only_floating = 0; /* only apply corner_radius and corner_radius_inner to floating windows */
 
 static const int blur = 1; /* flag to enable blur */
