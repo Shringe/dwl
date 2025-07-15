@@ -195,6 +195,7 @@ static const char *menucmd[] = { "wofi", "--show", "drun", NULL };
 static const char *emojicmd[] = { "wofi-emoji", NULL };
 static const char *cliphistcmd[] = { "sh", "-c", 
   "cliphist list | wofi --dmenu | cliphist decode | wl-copy", NULL };
+static const char *powercmd[] = { "wlogout", NULL };
 
 // Apps
 static const char *termcmd[] = { "wezterm", NULL };
@@ -232,6 +233,7 @@ static const Key keys[] = {
 
   // Menus
 	{ MODKEY,                    XKB_KEY_s,          spawn,            {.v = menucmd } },
+	{ MODKEY,                    XKB_KEY_x,          spawn,            {.v = powercmd } },
 	{ MODKEY,                    XKB_KEY_c,          spawn,            {.v = emojicmd } },
 	{ MODKEY,                    XKB_KEY_d,          spawn,            {.v = cliphistcmd } },
 
