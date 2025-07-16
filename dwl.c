@@ -2234,14 +2234,18 @@ run(char *startup_cmd)
 	/* Import environment variables then start systemd target */
 	if (fork() == 0) {
 		setsid();
-		
+
+		/* DISPLAY is only needed for XWAYLAND */
+#ifdef XWAYLAND
+#define IMPORT_ARGS "systemctl", "--user", "import-environment", "DISPLAY", "WAYLAND_DISPLAY", NULL
+#else
+#define IMPORT_ARGS "systemctl", "--user", "import-environment", "WAYLAND_DISPLAY", NULL
+#endif
+
 		/* First: import environment variables */
 		pid_t import_pid = fork();
 		if (import_pid == 0) {
-			execvp("systemctl", (char *const[]) {
-				"systemctl", "--user", "import-environment", 
-				"DISPLAY", "WAYLAND_DISPLAY", NULL
-			});
+			execvp("systemctl", (char *const[]) { IMPORT_ARGS });
 			exit(1);
 		}
 		
