@@ -509,7 +509,7 @@ static float transparent[4] = {0.1f, 0.1f, 0.1f, 0.0f};
 static struct zdwl_ipc_manager_v2_interface dwl_manager_implementation = {.release = dwl_ipc_manager_release, .get_output = dwl_ipc_manager_get_output};
 static struct zdwl_ipc_output_v2_interface dwl_output_implementation = {.release = dwl_ipc_output_release, .set_tags = dwl_ipc_output_set_tags, .set_layout = dwl_ipc_output_set_layout, .set_client_tags = dwl_ipc_output_set_client_tags};
 
-static int fullscreen_adaptive_sync_enabled = 1;
+static int fullscreen_adaptive_sync_enabled = 0;
 
 static int fullscreen_key_inhibit_enabled = 0;
 
