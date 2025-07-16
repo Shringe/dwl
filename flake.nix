@@ -15,8 +15,9 @@
         let
           pkgs = import nixpkgs { inherit system; };
           wlroots_package = pkgs.wlroots_0_19;
+          enable_xwayland = false;
 
-          buildDeps = with pkgs; [
+          baseDeps = with pkgs; [
             libinput
             wayland
             wlroots_package
@@ -26,17 +27,20 @@
             wayland-scanner
             pixman
 
-            # XWayland
-            xorg.libxcb
-            xorg.xcbutilwm
-            xwayland
-
             # Patches
             ## SceneFX
             # scenefx # outdated
             inputs.scenefx.packages.${system}.default
             libGL
           ];
+
+          xwaylandDeps = with pkgs; [
+            xorg.libxcb
+            xorg.xcbutilwm
+            xwayland
+          ];
+
+          buildDeps = baseDeps ++ (if enable_xwayland then xwaylandDeps else []);
         in rec {
           overlay = self: super: {
             dwl = packages.dwl;
@@ -73,9 +77,10 @@
               "WAYLAND_SCANNER=wayland-scanner"
               "PREFIX=$(out)"
               "MANDIR=$(man)/share/man"
+            ] ++ (if enable_xwayland then [
               ''XWAYLAND="-DXWAYLAND"''
               ''XLIBS="xcb xcb-icccm"''
-            ];
+            ] else []);
 
             strictDeps = true;
 
