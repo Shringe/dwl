@@ -15,7 +15,7 @@
         let
           pkgs = import nixpkgs { inherit system; };
           wlroots_package = pkgs.wlroots_0_19;
-          enable_xwayland = false;
+          enable_xwayland = true;
 
           baseDeps = with pkgs; [
             libinput
