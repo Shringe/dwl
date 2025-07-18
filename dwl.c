@@ -112,6 +112,7 @@ typedef struct {
 	unsigned int type; /* XDGShell or X11* */
 
 	Monitor *mon;
+	char *output;
 	struct wlr_scene_tree *scene;
 	struct wlr_scene_rect *border[4]; /* top, bottom, left, right */
 	struct wlr_scene_tree *scene_surface;
@@ -1170,6 +1171,7 @@ createmon(struct wl_listener *listener, void *data)
 	size_t i;
 	struct wlr_output_state state;
 	Monitor *m;
+	Client *c;
 
 	if (!wlr_output_init_render(wlr_output, alloc, drw))
 		return;
@@ -1256,6 +1258,13 @@ createmon(struct wl_listener *listener, void *data)
 		wlr_output_layout_add_auto(output_layout, wlr_output);
 	else
 		wlr_output_layout_add(output_layout, wlr_output, m->m.x, m->m.y);
+
+	wl_list_for_each(c, &clients, link) {
+		if (strcmp(wlr_output->name, c->output) == 0) {
+			c->mon = m;
+		}
+	}
+	updatemons(NULL, NULL);
 }
 
 void
@@ -1492,6 +1501,7 @@ destroynotify(struct wl_listener *listener, void *data)
 		wl_list_remove(&c->unmap.link);
 		wl_list_remove(&c->maximize.link);
 	}
+	free(c->output);
 	free(c);
 }
 
@@ -2227,6 +2237,10 @@ mapnotify(struct wl_listener *listener, void *data)
 		setmon(c, p->mon, p->tags);
 	} else {
 		applyrules(c);
+	}
+	c->output = strdup(c->mon->wlr_output->name);
+	if (c->output == NULL) {
+		die("oom");
 	}
 	printstatus();
 
@@ -3344,8 +3358,14 @@ void
 tagmon(const Arg *arg)
 {
 	Client *sel = focustop(selmon);
-	if (sel)
-		setmon(sel, dirtomon(arg->i), 0);
+	if (!sel)
+		return;
+	setmon(sel, dirtomon(arg->i), 0);
+	free(sel->output);
+	sel->output = strdup(sel->mon->wlr_output->name);
+	if (sel->output == NULL) {
+		die("oom");
+	}
 }
 
 void
