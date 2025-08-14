@@ -661,6 +661,9 @@ buttonpress(struct wl_listener *listener, void *data)
 			selmon = xytomon(cursor->x, cursor->y);
 			setmon(grabc, selmon, 0);
 			grabc = NULL;
+			/* Force update to cursor shape */
+			xytonode(cursor->x, cursor->y, NULL, &c, NULL, NULL, NULL);
+			focusclient(c, 1);
 			return;
 		}
 		cursor_mode = CurNormal;
