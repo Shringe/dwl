@@ -20,10 +20,9 @@ static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You ca
 /* logging */
 static int log_level = WLR_ERROR;
 
-/* NOTE: ALWAYS keep a rule declared even if you don't use rules (e.g leave at least one example) */
+/* AT LEAST ONE rule must exist. Define at least an EXAMPLE rule here. */
 static const Rule rules[] = {
 	/* app_id             title       tags mask     isfloating   monitor */
-	/* examples: */
 	{ "Gimp_EXAMPLE",     NULL,       0,            1,           -1 }, /* Start on currently visible tags floating, not tiled */
 	{ "firefox_EXAMPLE",  NULL,       1 << 8,       0,           -1 }, /* Start on ONLY tag "9" */
 };
@@ -37,18 +36,18 @@ static const Layout layouts[] = {
 };
 
 /* monitors */
-/* (x=-1, y=-1) is reserved as an "autoconfigure" monitor position indicator
- * WARNING: negative values other than (-1, -1) cause problems with Xwayland clients
- * https://gitlab.freedesktop.org/xorg/xserver/-/issues/899
-*/
-/* NOTE: ALWAYS add a fallback rule, even if you are completely sure it won't be used */
+/*
+ * (x=-1, y=-1) causes a monitor to "autoconfigure" its position
+ *
+ * WARNING: Due to https://gitlab.freedesktop.org/xorg/xserver/-/issues/899
+ * negative monitor positions other than (-1, -1) create problems for Xwayland
+ * clients
+ *
+ * AT LEAST ONE monitor rule must exist. Define at least a NULL default rule here. */
 static const MonitorRule monrules[] = {
-	/* name       mfact  nmaster scale layout       rotate/reflect                x    y */
-	/* example of a HiDPI laptop monitor:
-	{ "eDP-1",    0.5f,  1,      2,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
-	*/
-	/* defaults */
-	{ NULL,       0.55f, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
+	/* name            mfact  nmaster scale layout       rotate/reflect                x    y */
+	{ NULL,            0.55f, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
+	{ "eDP-1_EXAMPLE", 0.5f,  1,      2,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
 };
 
 /* keyboard */
