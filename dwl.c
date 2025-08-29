@@ -1326,14 +1326,29 @@ createpointer(struct wlr_pointer *pointer)
 			&& (device = wlr_libinput_get_device_handle(&pointer->base))) {
 
 		if (libinput_device_config_tap_get_finger_count(device)) {
+			/* Trackpad */
 			libinput_device_config_tap_set_enabled(device, tap_to_click);
 			libinput_device_config_tap_set_drag_enabled(device, tap_and_drag);
 			libinput_device_config_tap_set_drag_lock_enabled(device, drag_lock);
 			libinput_device_config_tap_set_button_map(device, button_map);
-		}
 
-		if (libinput_device_config_scroll_has_natural_scroll(device))
-			libinput_device_config_scroll_set_natural_scroll_enabled(device, natural_scrolling);
+			if (libinput_device_config_scroll_has_natural_scroll(device))
+				libinput_device_config_scroll_set_natural_scroll_enabled(device, trackpad_natural_scrolling);
+
+			if (libinput_device_config_accel_is_available(device)) {
+				libinput_device_config_accel_set_profile(device, trackpad_accel_profile);
+				libinput_device_config_accel_set_speed(device, trackpad_accel_speed);
+			}
+		} else {
+			/* Mouse */
+			if (libinput_device_config_scroll_has_natural_scroll(device))
+				libinput_device_config_scroll_set_natural_scroll_enabled(device, mouse_natural_scrolling);
+
+			if (libinput_device_config_accel_is_available(device)) {
+				libinput_device_config_accel_set_profile(device, mouse_accel_profile);
+				libinput_device_config_accel_set_speed(device, mouse_accel_speed);
+			}
+		}
 
 		if (libinput_device_config_dwt_is_available(device))
 			libinput_device_config_dwt_set_enabled(device, disable_while_typing);
@@ -1352,11 +1367,6 @@ createpointer(struct wlr_pointer *pointer)
 
 		if (libinput_device_config_send_events_get_modes(device))
 			libinput_device_config_send_events_set_mode(device, send_events_mode);
-
-		if (libinput_device_config_accel_is_available(device)) {
-			libinput_device_config_accel_set_profile(device, accel_profile);
-			libinput_device_config_accel_set_speed(device, accel_speed);
-		}
 	}
 
 	wlr_cursor_attach_input_device(cursor, &pointer->base);

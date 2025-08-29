@@ -1,0 +1,96 @@
+From 211b52988756e9fecccf071fdea82832e1e17a0c Mon Sep 17 00:00:00 2001
+From: mmistika <mistikasoft@gmail.com>
+Date: Tue, 24 Jun 2025 22:25:00 +0200
+Subject: [PATCH] Separate trackpad/mouse natural scroll and accel
+
+Signed-off-by: mmistika <mistikasoft@gmail.com>
+---
+ config.def.h | 12 +++++++++---
+ dwl.c        | 26 ++++++++++++++++++--------
+ 2 files changed, 27 insertions(+), 11 deletions(-)
+
+diff --git a/config.def.h b/config.def.h
+index 22d2171..9d05a89 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -67,10 +67,14 @@ static const int repeat_delay = 600;
+ static const int tap_to_click = 1;
+ static const int tap_and_drag = 1;
+ static const int drag_lock = 1;
+-static const int natural_scrolling = 0;
+ static const int disable_while_typing = 1;
+ static const int left_handed = 0;
+ static const int middle_button_emulation = 0;
++
++/* Natural scrolling */
++static const int trackpad_natural_scrolling = 0;
++static const int mouse_natural_scrolling = 0;
++
+ /* You can choose between:
+ LIBINPUT_CONFIG_SCROLL_NO_SCROLL
+ LIBINPUT_CONFIG_SCROLL_2FG
+@@ -97,8 +101,10 @@ static const uint32_t send_events_mode = LIBINPUT_CONFIG_SEND_EVENTS_ENABLED;
+ LIBINPUT_CONFIG_ACCEL_PROFILE_FLAT
+ LIBINPUT_CONFIG_ACCEL_PROFILE_ADAPTIVE
+ */
+-static const enum libinput_config_accel_profile accel_profile = LIBINPUT_CONFIG_ACCEL_PROFILE_ADAPTIVE;
+-static const double accel_speed = 0.0;
++static const enum libinput_config_accel_profile trackpad_accel_profile = LIBINPUT_CONFIG_ACCEL_PROFILE_ADAPTIVE;
++static const double trackpad_accel_speed = 0.0;
++static const enum libinput_config_accel_profile mouse_accel_profile = LIBINPUT_CONFIG_ACCEL_PROFILE_FLAT;
++static const double mouse_accel_speed = 0.0;
+ 
+ /* You can choose between:
+ LIBINPUT_CONFIG_TAP_MAP_LRM -- 1/2/3 finger tap maps to left/right/middle
+diff --git a/dwl.c b/dwl.c
+index c717c1d..f05d6c5 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -1083,14 +1083,29 @@ createpointer(struct wlr_pointer *pointer)
+ 			&& (device = wlr_libinput_get_device_handle(&pointer->base))) {
+ 
+ 		if (libinput_device_config_tap_get_finger_count(device)) {
++			/* Trackpad */
+ 			libinput_device_config_tap_set_enabled(device, tap_to_click);
+ 			libinput_device_config_tap_set_drag_enabled(device, tap_and_drag);
+ 			libinput_device_config_tap_set_drag_lock_enabled(device, drag_lock);
+ 			libinput_device_config_tap_set_button_map(device, button_map);
+-		}
+ 
+-		if (libinput_device_config_scroll_has_natural_scroll(device))
+-			libinput_device_config_scroll_set_natural_scroll_enabled(device, natural_scrolling);
++			if (libinput_device_config_scroll_has_natural_scroll(device))
++				libinput_device_config_scroll_set_natural_scroll_enabled(device, trackpad_natural_scrolling);
++
++			if (libinput_device_config_accel_is_available(device)) {
++				libinput_device_config_accel_set_profile(device, trackpad_accel_profile);
++				libinput_device_config_accel_set_speed(device, trackpad_accel_speed);
++			}
++		} else {
++			/* Mouse */
++			if (libinput_device_config_scroll_has_natural_scroll(device))
++				libinput_device_config_scroll_set_natural_scroll_enabled(device, mouse_natural_scrolling);
++
++			if (libinput_device_config_accel_is_available(device)) {
++				libinput_device_config_accel_set_profile(device, mouse_accel_profile);
++				libinput_device_config_accel_set_speed(device, mouse_accel_speed);
++			}
++		}
+ 
+ 		if (libinput_device_config_dwt_is_available(device))
+ 			libinput_device_config_dwt_set_enabled(device, disable_while_typing);
+@@ -1109,11 +1124,6 @@ createpointer(struct wlr_pointer *pointer)
+ 
+ 		if (libinput_device_config_send_events_get_modes(device))
+ 			libinput_device_config_send_events_set_mode(device, send_events_mode);
+-
+-		if (libinput_device_config_accel_is_available(device)) {
+-			libinput_device_config_accel_set_profile(device, accel_profile);
+-			libinput_device_config_accel_set_speed(device, accel_speed);
+-		}
+ 	}
+ 
+ 	wlr_cursor_attach_input_device(cursor, &pointer->base);
+-- 
+2.50.0
+
