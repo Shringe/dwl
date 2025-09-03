@@ -242,6 +242,7 @@ static const char *notescmd[] = { "joplin-desktop", NULL };
     { 0,  XKB_KEY_XF86AudioNext,                         spawn,        {.v = playernext } }, \
     { 0,  XKB_KEY_XF86AudioPrev,                         spawn,        {.v = playerprev } }, \
 
+#include "shiftview.c"
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
 	/* modifier                  key                 function          argument */
