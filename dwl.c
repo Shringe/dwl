@@ -1066,7 +1066,7 @@ cleanup(void)
 	if (fork() == 0) {
 		setsid();
 		execvp("systemctl", (char *const[]) {
-			"systemctl", "--user", "stop", "dwl-session.target", NULL
+			"systemctl", "--user", "stop", "wlroots-session.target", NULL
 		});
 		exit(1);
 	}
@@ -3166,7 +3166,7 @@ run(char *startup_cmd)
 		
 		/* Second: start target */
 		execvp("systemctl", (char *const[]) {
-			"systemctl", "--user", "start", "dwl-session.target", NULL
+			"systemctl", "--user", "start", "wlroots-session.target", NULL
 		});
 		
 		exit(1);
