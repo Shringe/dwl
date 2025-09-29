@@ -4,9 +4,9 @@ Join us on our IRC channel: [#dwl on Libera Chat]
 Or on the community-maintained [Discord server].
 
 dwl is a compact, hackable compositor for [Wayland] based on [wlroots]. It is
-intended to fill the same space in the Wayland world that dwm does in X11,
+intended to fill the same space in the Wayland world that [dwm] does in X11,
 primarily in terms of functionality, and secondarily in terms of
-philosophy. Like dwm, dwl is:
+philosophy. Like [dwm], dwl is:
 
 - Easy to understand, hack on, and extend with patches
 - One C source file (or a very small number) configurable via `config.h`
@@ -55,11 +55,11 @@ To enable XWayland, you should uncomment its flags in `config.mk`.
 ## Configuration
 
 All configuration is done by editing `config.h` and recompiling, in the same
-manner as dwm. There is no way to separately restart the window manager in
+manner as [dwm]. There is no way to separately restart the window manager in
 Wayland without restarting the entire display server, so any changes will take
 effect the next time dwl is executed.
 
-As in the dwm community, we encourage users to share patches they have
+As in the [dwm] community, we encourage users to share patches they have
 created. Check out the [dwl-patches] repository!
 
 ## Running dwl
@@ -124,11 +124,11 @@ You can find a [list of useful resources on our wiki].
 
 ## Background
 
-dwl is not meant to provide every feature under the sun. Instead, like dwm, it
+dwl is not meant to provide every feature under the sun. Instead, like [dwm], it
 sticks to features which are necessary, simple, and straightforward to implement
 given the base on which it is built. Implemented default features are:
 
-- Any features provided by dwm/Xlib: simple window borders, tags, keybindings,
+- Any features provided by [dwm]/Xlib: simple window borders, tags, keybindings,
   client rules, mouse move/resize. Providing a built-in status bar is an
   exception to this goal, to avoid dependencies on font rendering and/or drawing
   libraries when an external bar could work well.
@@ -145,10 +145,10 @@ given the base on which it is built. Implemented default features are:
 - Layer shell popups (used by Waybar)
 - Damage tracking provided by scenegraph API
 
-Given the Wayland architecture, dwl has to implement features from dwm **and**
+Given the Wayland architecture, dwl has to implement features from [dwm] **and**
 the xorg-server. Because of this, it is impossible to maintain the original
 project goal of 2000 SLOC and have a reasonably complete compositor with
-features comparable to dwm. However, this does not mean that the code will grow
+features comparable to [dwm]. However, this does not mean that the code will grow
 indiscriminately. We will try to keep the code as small as possible.
 
 Features under consideration (possibly as patches) are:
@@ -172,7 +172,7 @@ developers. This was made possible in many cases by looking at how sway
 accomplished something, then trying to do the same in as suckless a way as
 possible.
 
-Many thanks to suckless.org and the dwm developers and community for the
+Many thanks to suckless.org and the [dwm] developers and community for the
 inspiration, and to the various contributors to the project, including:
 
 - **Devin J. Pohly for creating and nurturing the fledgling project**
@@ -183,6 +183,7 @@ inspiration, and to the various contributors to the project, including:
 
 
 [wlroots]: https://gitlab.freedesktop.org/wlroots
+[dwm]: https://dwm.suckless.org/
 [`systemd --user`]: https://wiki.archlinux.org/title/Systemd/User
 [#dwl on Libera Chat]: https://web.libera.chat/?channels=#dwl
 [0.7-rc1]: https://codeberg.org/dwl/dwl/releases/tag/v0.7-rc1
