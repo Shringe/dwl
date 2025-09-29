@@ -118,6 +118,15 @@ script with the line
 
 To get a list of status bars that work with dwl consult our [wiki].
 
+### (Known) Java nonreparenting WM issue
+Certain IDEs don't display correctly unless an environmental variable for Java AWT
+indicates that the WM is nonreparenting.
+
+For some Java AWT-based IDEs, such as Xilinx Vivado and Microchip MPLAB X, the
+following environment variable needs to be set before running the IDE or dwl:
+
+    export _JAVA_AWT_WM_NONREPARENTING=1
+
 ## Replacements for X applications
 
 You can find a [list of useful resources on our wiki].
