@@ -1,7 +1,8 @@
 # dwl - dwm for Wayland
 
-Join us on our IRC channel: [#dwl on Libera Chat]  
-Or on the community-maintained [Discord server].
+Join us on our [Discord server]
+Or Matrix: [#dwl-official:matrix.org]
+Or on our IRC channel: [#dwl on Libera Chat]
 
 dwl is a compact, hackable compositor for [Wayland] based on [wlroots]. It is
 intended to fill the same space in the Wayland world that [dwm] does in X11,
@@ -209,3 +210,4 @@ inspiration, and to the various contributors to the project, including:
 [wiki]: https://codeberg.org/dwl/dwl/wiki/Home#compatible-status-bars
 [Discord server]: https://discord.gg/jJxZnrGPWN
 [Wayland]: https://wayland.freedesktop.org/
+[#dwl-official:matrix.org]: https://matrix.to/#/#dwl-official:matrix.org
